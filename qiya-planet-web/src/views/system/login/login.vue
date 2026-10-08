@@ -10,77 +10,70 @@
 -->
 <template>
   <div class="login-container">
-    <div class="box-item desc">
-      <div class="welcome">
-        <p>欢迎登录 qiya_planet</p>
-        <p class="desc">
-          qiya_planet 专注萌芽学习。基于 SmartAdmin 二次改造，包名为 com.study.planet.wp。
-          技术栈为 SpringBoot + Sa-Token + MyBatis-Plus 和 Vue3 + Vite + Ant Design Vue。
-          <br />
-          <br />
-          <span class="setence">
-            本项目使用 MIT License。
-            <br />
-            原作品 Copyright (c) 2020 1024-lab，修改部分 Copyright (c) 2026 qiya_planet。
-          </span>
-        </p>
-      </div>
-      <div class="app-qr-box">
-        <div class="app-qr">
-          <span class="qr-desc">qiya_planet</span>
-          <span class="qr-desc">专注萌芽学习</span>
+    <div class="login-card">
+      <div class="box-item desc">
+        <div class="planet-panel">
+          <p class="planet-kicker">欢迎来到</p>
+          <h1>启芽星球</h1>
+          <p class="planet-sub">听一听，读一首，再算一道</p>
+          <img class="planet-art" :src="planetHero" alt="启芽星球：听力海湾、诗词仙山、数理工坊" />
+          <div class="planet-islands">
+            <span>听力海湾</span>
+            <span>诗词仙山</span>
+            <span>数理工坊</span>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="box-item login">
-      <img class="login-qr" :src="loginQR" />
-      <div class="login-title">账号登录</div>
-      <a-form ref="formRef" class="login-form" :model="loginForm" :rules="rules">
-        <a-form-item name="loginName">
-          <a-input v-model:value.trim="loginForm.loginName" placeholder="请输入用户名" />
-        </a-form-item>
-        <a-form-item name="emailCode" v-if="emailCodeShowFlag">
-          <a-input-group compact>
-            <a-input style="width: calc(100% - 110px)" v-model:value="loginForm.emailCode" autocomplete="on" placeholder="请输入邮箱验证码" />
-            <a-button @click="sendSmsCode" class="code-btn" type="primary" :disabled="emailCodeButtonDisabled">
-              {{ emailCodeTips }}
-            </a-button>
-          </a-input-group>
-        </a-form-item>
-        <a-form-item name="password">
-            <a-input-password
-              v-model:value="loginForm.password"
-              autocomplete="on"
-              :type="showPassword ? 'text' : 'password'"
-              placeholder="请输入密码"
-            />
-        </a-form-item>
-        <a-form-item name="captchaCode">
-          <a-input class="captcha-input" v-model:value.trim="loginForm.captchaCode" placeholder="请输入验证码" />
-          <img class="captcha-img" :src="captchaBase64Image" @click="getCaptcha" />
-        </a-form-item>
-
-        <a-form-item>
-          <div class="btn" @click="onLogin">登录</div>
-        </a-form-item>
-        <a-form-item>
-          <span>  默认账号：admin，请登录后立即修改密码</span>
-        </a-form-item>
-      </a-form>
-      <div class="more">
-        <div class="title-box">
-          <p class="line"></p>
-          <p class="title">其他方式登录</p>
-          <p class="line"></p>
-        </div>
-        <div class="login-type">
-          <img :src="wechatIcon" />
-          <img :src="aliIcon" />
-          <img :src="douyinIcon" />
-          <img :src="qqIcon" />
-          <img :src="weiboIcon" />
-          <img :src="feishuIcon" />
-          <img :src="googleIcon" />
+      <div class="box-item login">
+        <img class="login-qr" :src="loginQR" />
+        <div class="login-title">账号登录</div>
+        <a-form ref="formRef" class="login-form" :model="loginForm" :rules="rules">
+          <a-form-item name="loginName">
+            <a-input v-model:value.trim="loginForm.loginName" placeholder="请输入用户名" />
+          </a-form-item>
+          <a-form-item name="emailCode" v-if="emailCodeShowFlag">
+            <a-input-group compact>
+              <a-input style="width: calc(100% - 110px)" v-model:value="loginForm.emailCode" autocomplete="on" placeholder="请输入邮箱验证码" />
+              <a-button @click="sendSmsCode" class="code-btn" type="primary" :disabled="emailCodeButtonDisabled">
+                {{ emailCodeTips }}
+              </a-button>
+            </a-input-group>
+          </a-form-item>
+          <a-form-item name="password">
+              <a-input-password
+                v-model:value="loginForm.password"
+                autocomplete="on"
+                :type="showPassword ? 'text' : 'password'"
+                placeholder="请输入密码"
+              />
+          </a-form-item>
+          <a-form-item name="captchaCode">
+            <a-input class="captcha-input" v-model:value.trim="loginForm.captchaCode" placeholder="请输入验证码" />
+            <img class="captcha-img" :src="captchaBase64Image" @click="getCaptcha" />
+          </a-form-item>
+  
+          <a-form-item>
+            <div class="btn" @click="onLogin">登录</div>
+          </a-form-item>
+          <a-form-item v-if="showExtraLogin">
+            <span>默认账号：admin，请登录后立即修改密码</span>
+          </a-form-item>
+        </a-form>
+        <div class="more" v-if="showExtraLogin">
+          <div class="title-box">
+            <p class="line"></p>
+            <p class="title">其他方式登录</p>
+            <p class="line"></p>
+          </div>
+          <div class="login-type">
+            <img :src="wechatIcon" />
+            <img :src="aliIcon" />
+            <img :src="douyinIcon" />
+            <img :src="qqIcon" />
+            <img :src="weiboIcon" />
+            <img :src="feishuIcon" />
+            <img :src="googleIcon" />
+          </div>
         </div>
       </div>
     </div>
@@ -95,6 +88,7 @@
   import { LOGIN_DEVICE_ENUM } from '/@/constants/system/login-device-const';
   import { useUserStore } from '/@/store/modules/system/user';
   import loginQR from '/@/assets/images/login/login-qr.png';
+  import planetHero from '/@/assets/images/login/qiya-planet-hero.svg';
   import wechatIcon from '/@/assets/images/login/wechat-icon.png';
   import aliIcon from '/@/assets/images/login/ali-icon.png';
   import douyinIcon from '/@/assets/images/login/douyin-icon.png';
@@ -127,6 +121,8 @@
   };
 
   const showPassword = ref(false);
+  // 其他登录方式和默认账号提示暂时隐藏
+  const showExtraLogin = ref(false);
   const router = useRouter();
   const formRef = ref();
   const rememberPwd = ref(false);

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.planet.wp.admin.module.business.qiya.dao.StudentDao">
+    <select id="query" resultType="com.study.planet.wp.admin.module.business.qiya.domain.vo.StudentVO">
+        SELECT * FROM t_qiya_student
+        <where>
+            deleted_flag = 0
+            <if test="query.searchWord != null and query.searchWord != ''">
+                AND (
+                INSTR(child_name, #{query.searchWord})
+                OR INSTR(grade_name, #{query.searchWord})
+                OR INSTR(parent_name, #{query.searchWord})
+                )
+            </if>
+        </where>
+        ORDER BY student_id DESC
+    </select>
+</mapper>

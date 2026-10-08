@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.planet.wp.admin.module.business.qiya.dao.AlbumDao">
+    <select id="query" resultType="com.study.planet.wp.admin.module.business.qiya.domain.vo.AlbumVO">
+        SELECT * FROM t_qiya_album
+        <where>
+            deleted_flag = 0
+            <if test="query.searchWord != null and query.searchWord != ''">
+                AND (
+                INSTR(album_name, #{query.searchWord})
+                OR INSTR(level_name, #{query.searchWord})
+                )
+            </if>
+        </where>
+        ORDER BY album_id DESC
+    </select>
+</mapper>

@@ -6,14 +6,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  .login-card {
+    display: flex;
+    align-items: stretch;
+    width: 928px;
+    max-width: calc(100vw - 48px);
+  }
   .box-item {
-    width: 464px;
-    height: 600px;
+    width: 50%;
+    height: auto;
+    min-height: 0;
+    box-sizing: border-box;
     &.desc {
       background: #003b94;
       border-radius: 12px 0px 0px 12px;
       box-shadow: 0px 16px 73px 8px rgba(203, 203, 203, 0.2);
-      padding: 23px 25px;
+      padding: 28px 28px 22px;
+      display: flex;
+      overflow: hidden;
     }
     &.login {
       background: #ffffff;
@@ -22,6 +32,66 @@
       position: relative;
       border: solid 1px #efefef;
     }
+    .planet-panel {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+      color: #ffffff;
+
+      .planet-kicker {
+        margin: 8px 0 0;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 3px;
+        opacity: 0.82;
+      }
+
+      h1 {
+        margin: 8px 0 0;
+        font-size: 34px;
+        line-height: 1.2;
+        font-weight: 700;
+        color: #ffffff;
+      }
+
+      .planet-sub {
+        margin: 8px 0 0;
+        font-size: 15px;
+        font-weight: 500;
+        opacity: 0.92;
+      }
+
+      .planet-art {
+        flex: 1 1 0px;
+        width: 100%;
+        height: 0;
+        min-height: 0;
+        margin: 8px 0 12px;
+        object-fit: contain;
+        object-position: center;
+      }
+
+      .planet-islands {
+        display: flex;
+        gap: 8px;
+
+        span {
+          flex: 1;
+          height: 32px;
+          border-radius: 999px;
+          background: rgba(255, 255, 255, 0.14);
+          font-size: 13px;
+          font-weight: 600;
+          line-height: 32px;
+          text-align: center;
+        }
+      }
+    }
+
     .login-qr {
       position: absolute;
       top: 0;
@@ -139,6 +209,10 @@
 
       .captcha-img {
         cursor: pointer;
+      }
+
+      > .ant-form-item:last-child {
+        margin-bottom: 0;
       }
     }
     .ant-input,

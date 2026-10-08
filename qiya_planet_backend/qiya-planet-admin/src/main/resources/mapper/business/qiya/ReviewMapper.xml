@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.planet.wp.admin.module.business.qiya.dao.ReviewDao">
+    <select id="query" resultType="com.study.planet.wp.admin.module.business.qiya.domain.vo.ReviewVO">
+        SELECT * FROM t_qiya_review
+        <where>
+            deleted_flag = 0
+            <if test="query.searchWord != null and query.searchWord != ''">
+                AND (
+                INSTR(target_name, #{query.searchWord})
+                OR INSTR(content, #{query.searchWord})
+                )
+            </if>
+            <if test="query.statusName != null and query.statusName != ''">
+                AND status_name = #{query.statusName}
+            </if>
+            <if test="query.subjectCode != null and query.subjectCode != ''">
+                AND subject_code = #{query.subjectCode}
+            </if>
+        </where>
+        ORDER BY review_id DESC
+    </select>
+</mapper>

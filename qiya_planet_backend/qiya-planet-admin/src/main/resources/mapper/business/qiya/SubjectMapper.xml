@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.planet.wp.admin.module.business.qiya.dao.SubjectDao">
+    <select id="query" resultType="com.study.planet.wp.admin.module.business.qiya.domain.vo.SubjectVO">
+        SELECT * FROM t_qiya_subject
+        <where>
+            deleted_flag = 0
+            <if test="query.searchWord != null and query.searchWord != ''">
+                AND (
+                INSTR(subject_name, #{query.searchWord})
+                OR INSTR(status_name, #{query.searchWord})
+                OR INSTR(grade_scope, #{query.searchWord})
+                )
+            </if>
+            <if test="query.statusName != null and query.statusName != ''">
+                AND status_name = #{query.statusName}
+            </if>
+        </where>
+        ORDER BY subject_id DESC
+    </select>
+</mapper>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.planet.wp.admin.module.business.qiya.dao.PoemDao">
+    <select id="query" resultType="com.study.planet.wp.admin.module.business.qiya.domain.vo.PoemVO">
+        SELECT * FROM t_qiya_poem
+        <where>
+            deleted_flag = 0
+            <if test="query.searchWord != null and query.searchWord != ''">
+                AND (
+                INSTR(title, #{query.searchWord})
+                OR INSTR(author_name, #{query.searchWord})
+                OR INSTR(content, #{query.searchWord})
+                )
+            </if>
+        </where>
+        ORDER BY poem_id DESC
+    </select>
+</mapper>

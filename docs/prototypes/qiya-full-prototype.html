@@ -191,10 +191,34 @@ tr:hover td { background: #f8fafc; }
 .pick-cands .chip.is-on { background: #0f766e; color: #fff; }
 .cam-page { display: flex; flex-direction: column; gap: 10px; }
 .pc-main .finder { min-height: 320px; flex: none; }
+
+.qs-grade { display: flex; gap: 6px; align-items: center; margin-left: 6px; padding-left: 10px; border-left: 1px solid rgba(255,255,255,.28); }
+.qs-grade span { font-size: 12px; opacity: .85; }
+.qs-grade button { background: #0f2744; }
+.qs-grade button.is-on { background: #0f766e; }
+.slot-grade { cursor: default; }
+#qiya-studio[data-grade="pre"] .kid .cta { font-size: 20px; padding: 16px 12px; }
+#qiya-studio[data-grade="pre"] .kid .card b,
+#qiya-studio[data-grade="pre"] .kid .slot-task-listen,
+#qiya-studio[data-grade="pre"] .kid .slot-task-play,
+#qiya-studio[data-grade="pre"] .kid .slot-task-read,
+#qiya-studio[data-grade="pre"] .kid .slot-task-math { font-size: 18px; }
+#qiya-studio[data-grade="pre"] .kid .grid2 { gap: 12px; }
+#qiya-studio[data-grade="pre"] .hide-pre,
+#qiya-studio[data-grade="pre"] .pc-side .nav-more,
+#qiya-studio[data-grade="pre"] .pc .kpis,
+#qiya-studio[data-grade="pre"] .math-pad,
+#qiya-studio[data-grade="pre"] .math-modes,
+#qiya-studio[data-grade="pre"] .math-digits { display: none !important; }
+#qiya-studio[data-grade="mid"] .kid .screen-wrap { background: linear-gradient(180deg,#e7edf4,#f7f8fb 46%,#e8eef5); }
+#qiya-studio[data-grade="mid"] .kid .planet { filter: grayscale(.35); opacity: .72; }
+#qiya-studio:not([data-grade="g36"]):not([data-grade="mid"]) .only-upper { display: none !important; }
+#qiya-studio:not([data-grade="mid"]) .only-mid { display: none !important; }
+#qiya-studio:not([data-grade="pre"]) .only-pre { display: none !important; }
 </style>
 </head>
 <body>
-<div id="qiya-studio">
+<div id="qiya-studio" data-grade="g12">
   <div class="qs-bar">
     <h1>启芽星球原型</h1>
     <button type="button" class="is-on" data-end="student-app">学生 App</button>
@@ -202,7 +226,14 @@ tr:hover td { background: #f8fafc; }
     <button type="button" data-end="student-pc">学生 PC</button>
     <button type="button" data-end="parent-pc">家长 PC</button>
     <button type="button" data-end="admin">管理后台</button>
-    <span class="qs-note">点击端和页面即可切换 · 数据为演示账号「豆豆」 · 拍照从取景开始</span>
+    <div class="qs-grade">
+      <span>看年级</span>
+      <button type="button" data-grade="pre">学前</button>
+      <button type="button" class="is-on" data-grade="g12">1-2年级</button>
+      <button type="button" data-grade="g36">3-6年级</button>
+      <button type="button" data-grade="mid">初中</button>
+    </div>
+    <span class="qs-note">「看年级」只给评审切换。孩子页面上的年级不能点 · 默认豆豆二年级</span>
   </div>
 
 <section class="qs-stage is-on" data-end="student-app">
@@ -210,17 +241,19 @@ tr:hover td { background: #f8fafc; }
     <div class="phone-bar"><span>9:41</span><span class="capsule">启芽星球 · 学生</span><span>●●●</span></div>
     <div class="screen-wrap">
       <div class="view is-on" data-view="home">
-        <div class="row"><div><p class="h">下午好，豆豆</p><p class="s">今天把好吃的灯塔再点亮一点</p></div><button class="avatar" type="button" data-view="mine">🌱</button></div>
+        <div class="row"><div><p class="h slot-greet">下午好，豆豆</p><p class="s"><span class="chip slot-grade">二年级</span> <span class="slot-home-sub">今天把好吃的灯塔再点亮一点</span></p></div><button class="avatar" type="button" data-view="mine">🌱</button></div>
         <div class="row"><div class="planet"></div><span class="chip">连续探险 5 天</span></div>
         <div class="grid2">
-          <button class="card" type="button" data-view="listen"><span class="tiny">听一听</span><b>磨耳朵 1 段</b></button>
-          <button class="card" type="button" data-view="map"><span class="tiny">闯一闯</span><b>好吃的 第 3 关</b></button>
-          <button class="card" type="button" data-view="poem" data-open-poem="jing"><span class="tiny">读一读</span><b>《静夜思》</b></button>
-          <button class="card" type="button" data-view="math"><span class="tiny">练一练</span><b>跟进：退位减法</b></button>
+          <button class="card" type="button" data-view="listen"><span class="tiny">听一听</span><b class="slot-task-listen">磨耳朵 1 段</b></button>
+          <button class="card" type="button" data-view="map"><span class="tiny">闯一闯</span><b class="slot-task-play">好吃的 第 3 关</b></button>
+          <button class="card" type="button" data-view="poem" data-open-poem="jing"><span class="tiny">读一读</span><b class="slot-task-read">《静夜思》</b></button>
+          <button class="card" type="button" data-view="math"><span class="tiny">练一练</span><b class="slot-task-math">跟进：退位减法</b></button>
         </div>
-        <button class="cta" type="button" data-view="battle">继续今天 · 好吃的第 3 关</button>
-        <p class="s">没做完的优先。下面四件事可以稍后再点。</p>
-        <div class="hint">启芽建议：fork 还不稳，今天这条主路会先复习它，只要 3 分钟。</div>
+        <button class="cta slot-cta" type="button" data-view="battle">继续今天 · 好吃的第 3 关</button>
+        <p class="s slot-home-note">没做完的优先。下面四件事可以稍后再点。</p>
+        <div class="hint slot-home-hint">启芽建议：fork 还不稳，今天这条主路会先复习它，只要 3 分钟。</div>
+        <div class="card only-upper slot-today">今天还剩：复习 fork，再看《静夜思》。</div>
+        <div class="card only-mid slot-mastery">掌握度 64% · 用时 6 分钟。不排名。</div>
       </div>
       <div class="view" data-view="map">
         <div class="row"><div><p class="h">听力海湾</p><p class="s">点亮主题世界，把词收进单词本</p></div><button class="avatar" type="button" data-view="book">本</button></div>
@@ -236,7 +269,7 @@ tr:hover td { background: #f8fafc; }
       </div>
       <div class="view" data-view="battle">
         <div class="row"><span>修理袋 1</span><span>4 / 8</span><span>★ 2</span></div>
-        <p class="s" style="text-align:center">先在心里说出来，再选</p>
+        <p class="s slot-battle-lead" style="text-align:center">先在心里说出来，再选</p>
         <p class="q">听一听，哪张图是 apple？</p>
         <button class="ghost" type="button" data-act="正在播放 apple。先在心里说出来，再选。">🔊 apple</button>
         <div class="choices" id="kid-choices">
@@ -245,7 +278,7 @@ tr:hover td { background: #f8fafc; }
           <button type="button">🥛 牛奶</button>
           <button type="button">🍞 面包</button>
         </div>
-        <div class="hint">修理袋：fork 本关结束前还会再出现一次</div>
+        <div class="hint hide-pre">修理袋：fork 本关结束前还会再出现一次</div>
         <div class="hint" id="kid-hint" hidden>记忆贝壳：apple 是红苹果砸在桌上，叮！</div>
       </div>
       <div class="view" data-view="settle">
@@ -253,6 +286,7 @@ tr:hover td { background: #f8fafc; }
         <p class="q">★ ★ ☆</p>
         <div class="card"><p class="s">新会的词</p><div class="pills"><span>apple</span><span>cup</span><span>plate</span></div><p class="s">还要再修</p><div class="pills"><span class="warn">fork</span></div></div>
         <p class="s">明天会遇见 fork。先回星球也算今天完成。</p>
+        <p class="s only-upper slot-settle-extra">这一关正确率 75%。不排名。</p>
         <button class="cta" type="button" data-view="home">回星球</button>
         <button class="ghost" type="button" data-view="map">还想再闯一关</button>
       </div>
@@ -381,6 +415,10 @@ tr:hover td { background: #f8fafc; }
         <p class="s math-progress">第 1 / 10 题 · 可停 · 不排名</p>
         <div class="bar"><i class="math-bar" style="width:10%"></i></div>
         <p class="q big-q math-q">32 − 17 = ?</p>
+        <div class="choices only-pre">
+          <button type="button" data-act="这一堆更多。学前点大图，不用键盘。">🍎🍎🍎🍎🍎 更多</button>
+          <button type="button" data-act="这一堆少一些。">🍎🍎🍎 少一些</button>
+        </div>
         <div class="vert-box" hidden>
           <div class="vert-a">32</div>
           <div class="vert-b">− 17</div>
@@ -424,7 +462,7 @@ tr:hover td { background: #f8fafc; }
       </div>
       <div class="view" data-view="points">
         <p class="h">小学知识点</p>
-        <p class="s">自由点选，不锁关卡。今天的 10 题跟的是当前这个点。</p>
+        <p class="s slot-point-note">自由点选，不锁关卡。今天的 10 题跟的是当前这个点。</p>
         <button class="item is-pick" type="button" data-math-point="main" data-view="math" data-act="当前跟进：退位减法。"><b>退位减法</b><span class="tiny">二年级 · 当前跟进</span></button>
         <button class="item" type="button" data-math-point="fallback" data-view="math" data-act="先回去修 20 以内退位。今天这组换成更小的数。"><b>20 以内退位</b><span class="tiny">一年级 · 建议回退</span></button>
         <button class="item" type="button" data-math-point="later" data-act="表内乘法已经较熟，今天先不加新题。"><b>表内乘法</b><span class="tiny">二年级 · 已掌握</span></button>
@@ -437,16 +475,16 @@ tr:hover td { background: #f8fafc; }
       </div>
       <div class="view" data-view="mine">
         <p class="h">成长舱</p>
-        <div class="card">豆豆 · 小学 2 年级 · 连续 5 天</div>
+        <div class="card slot-mine">豆豆 · 小学 2 年级 · 连续 5 天</div>
         <button class="item" type="button" data-view="book">单词本 · 18 个新词</button>
         <button class="item" type="button" data-view="points">数学跟进 · 退位减法</button>
         <div class="hint">家长中心请让爸爸妈妈从「家长 App」进入</div>
       </div>
       <nav class="nav4">
-        <button class="is-on" type="button" data-view="home">星球</button>
-        <button type="button" data-view="map">英语</button>
-        <button type="button" data-view="poet">诗词</button>
-        <button type="button" data-view="math">数学</button>
+        <button class="is-on slot-nav-home" type="button" data-view="home">星球</button>
+        <button class="slot-nav-en" type="button" data-view="map">英语</button>
+        <button class="slot-nav-poem" type="button" data-view="poet">诗词</button>
+        <button class="slot-nav-math" type="button" data-view="math">数学</button>
       </nav>
     </div>
   </div>
@@ -458,8 +496,8 @@ tr:hover td { background: #f8fafc; }
     <div class="screen-wrap">
       <div class="view is-on" data-view="phome">
         <p class="h">豆豆这周</p>
-        <p class="s">小学 2 年级 · 已绑定</p>
-        <div class="card">豆豆这周新认识 18 个生活单词。英语薄弱：fork（听音错 2 次）。数学薄弱：退位减法，建议回看 20 以内，不要加难度。错因：看错 4 次，还不会 2 次。</div>
+        <p class="s slot-parent-grade">小学 2 年级 · 已绑定</p>
+        <div class="card slot-parent-card">豆豆这周新认识 18 个生活单词，正在点亮「好吃的」。数学卡在退位减法，建议回看 20 以内。错因里有看错，也有还不会。</div>
         <button class="ghost" type="button" data-view="pfollow">查看建议与跟进点</button>
         <button class="ghost" type="button" data-view="pmember">家庭会员 · 暂未开放</button>
         <div class="grid2">
@@ -496,7 +534,7 @@ tr:hover td { background: #f8fafc; }
         <button class="item" type="button" data-toggle="1">允许拍照识词：开</button>
         <button class="item" type="button" data-toggle="1">晚 21:30 后只开磨耳朵</button>
         <button class="item" type="button" data-toggle="1">跨岛漂流瓶：开，每天最多 1 个</button>
-        <button class="item" type="button" data-toggle="1">年级档：小学 1-2 年级</button>
+        <button class="item slot-parent-set" type="button" data-act="改年级只在家长端。已会的关和单词本都保留，之后的新题按新年级出。数学跟进最多挪一步。孩子端的年级不能点。">年级档：小学 1-2 年级</button>
       </div>
       <div class="view" data-view="pphoto">
         <p class="h">拍照记录</p>
@@ -527,26 +565,28 @@ tr:hover td { background: #f8fafc; }
 
 <section class="qs-stage" data-end="student-pc">
   <div class="pc">
-    <div class="pc-top"><span>启芽星球 学习机 · 豆豆</span><span>小学 2 年级 · 连续 5 天</span></div>
+    <div class="pc-top"><span>启芽星球 学习机 · 豆豆</span><span class="slot-pc-grade">小学 2 年级 · 连续 5 天</span></div>
     <div class="pc-body">
       <aside class="pc-side">
         <button class="is-on" type="button" data-view="shome">今日探险</button>
-        <button type="button" data-view="smap">英语闯关</button>
-        <button type="button" data-view="sbook">单词本</button>
-        <button type="button" data-view="spoet">诗词仙山</button>
-        <button type="button" data-view="smath">数理工坊</button>
+        <button class="nav-more" type="button" data-view="smap">英语闯关</button>
+        <button class="nav-more" type="button" data-view="sbook">单词本</button>
+        <button class="nav-more" type="button" data-view="spoet">诗词仙山</button>
+        <button class="nav-more" type="button" data-view="smath">数理工坊</button>
         <button type="button" data-view="slisten">磨耳朵</button>
       </aside>
       <main class="pc-main">
         <div class="view is-on" data-view="shome">
-          <p class="h">打开就学</p>
+          <p class="h slot-pc-title">打开就学</p>
           <div class="kpis">
-            <button class="kpi" type="button" data-view="slisten"><b>听一听</b><span class="tiny">厨房里的苹果</span></button>
-            <button class="kpi" type="button" data-view="sbattle"><b>闯一闯</b><span class="tiny">好吃的 第 3 关</span></button>
-            <button class="kpi" type="button" data-view="spoet" data-open-poem="jing"><b>读一读</b><span class="tiny">静夜思</span></button>
-            <button class="kpi" type="button" data-view="smath"><b>练一练</b><span class="tiny">退位减法</span></button>
+            <button class="kpi" type="button" data-view="slisten"><b>听一听</b><span class="tiny slot-task-listen">厨房里的苹果</span></button>
+            <button class="kpi" type="button" data-view="sbattle"><b>闯一闯</b><span class="tiny slot-task-play">好吃的 第 3 关</span></button>
+            <button class="kpi" type="button" data-view="spoet" data-open-poem="jing"><b>读一读</b><span class="tiny slot-task-read">静夜思</span></button>
+            <button class="kpi" type="button" data-view="smath"><b>练一练</b><span class="tiny slot-task-math">退位减法</span></button>
           </div>
-          <div class="panel" style="margin-top:12px">继续今天：好吃的第 3 关还没做完。做完就回星球，不自动跳到诗词和数学。</div>
+          <div class="panel slot-pc-panel" style="margin-top:12px">继续今天：好吃的第 3 关还没做完。做完就回星球，不自动跳到诗词和数学。</div>
+          <div class="card only-upper slot-today">今天还剩：复习 fork，再看《静夜思》。</div>
+          <div class="card only-mid slot-mastery">掌握度 64% · 用时 6 分钟。不排名。</div>
         </div>
             <div class="view" data-view="smap">
           <div class="split">
@@ -677,6 +717,10 @@ tr:hover td { background: #f8fafc; }
         <p class="s math-progress">第 1 / 10 题 · 可停 · 不排名</p>
         <div class="bar"><i class="math-bar" style="width:10%"></i></div>
         <p class="q big-q math-q">32 − 17 = ?</p>
+        <div class="choices only-pre">
+          <button type="button" data-act="这一堆更多。学前点大图，不用键盘。">🍎🍎🍎🍎🍎 更多</button>
+          <button type="button" data-act="这一堆少一些。">🍎🍎🍎 少一些</button>
+        </div>
         <div class="vert-box" hidden>
           <div class="vert-a">32</div>
           <div class="vert-b">− 17</div>
@@ -710,7 +754,7 @@ tr:hover td { background: #f8fafc; }
         </div>
             </div>
             <div class="panel">
-              <p class="s">小学知识点 · 不绑教材</p>
+              <p class="s slot-point-note">小学知识点 · 不绑教材</p>
               <button class="item is-pick" type="button" data-math-point="main" data-act="当前跟进：退位减法。">退位减法 · 当前</button>
               <button class="item" type="button" data-math-point="fallback" data-act="先回去修 20 以内退位。今天这组换成更小的数。">20 以内 · 可回退</button>
               <button class="item" type="button" data-math-point="later" data-act="表内乘法先不练。不会因此跳到后面的知识点。">表内乘法 · 已掌握</button>
@@ -736,7 +780,7 @@ tr:hover td { background: #f8fafc; }
 
 <section class="qs-stage" data-end="parent-pc">
   <div class="pc">
-    <div class="pc-top"><span>启芽星球 家长中心</span><span>当前孩子：豆豆</span></div>
+    <div class="pc-top"><span>启芽星球 家长中心</span><span class="slot-parent-pc">当前孩子：豆豆 · 二年级</span></div>
     <div class="pc-body">
       <aside class="pc-side">
         <button class="is-on" type="button" data-view="dhome">学习概览</button>
@@ -750,7 +794,7 @@ tr:hover td { background: #f8fafc; }
       <main class="pc-main">
         <div class="view is-on" data-view="dhome">
           <p class="h">本周人话报告</p>
-          <div class="panel">豆豆这周英语新认识 18 个生活单词，闯过「我家」，正在点亮「好吃的」。cup、apple 已经比较熟。数学卡在退位减法——孩子自己选了 2 次「还不会」、4 次「看错了」。建议回退 20 以内再练 8 题。</div>
+          <div class="panel slot-parent-card">豆豆这周新认识 18 个生活单词，正在点亮「好吃的」。数学卡在退位减法，建议回看 20 以内。错因里有看错，也有还不会。</div>
           <button class="cta" type="button" data-view="dai" style="margin-top:12px">打开 AI 学情与图谱</button>
           <div class="kpis" style="margin-top:12px">
             <div class="kpi"><b>86 分钟</b><span class="tiny">学习时长</span></div>
@@ -868,22 +912,27 @@ tr:hover td { background: #f8fafc; }
     <div class="pc-body">
       <aside class="admin-side">
         <div class="logo">启芽星球</div>
-        <div class="group">运营</div>
+        <div class="group">每天先看</div>
         <button class="is-on" type="button" data-view="adash">工作台</button>
-        <button type="button" data-view="akids">学生档案</button>
-        <button type="button" data-view="adata">学习数据看板</button>
+        <button type="button" data-view="aaudit">审核中心</button>
+        <button type="button" data-view="akids">学生与家庭</button>
+        <button type="button" data-view="adata">学习数据</button>
+        <div class="group">英语</div>
+        <button type="button" data-view="awords">词库</button>
+        <button type="button" data-view="alevels">闯关世界</button>
+        <button type="button" data-view="alisten">磨耳朵</button>
+        <button type="button" data-view="amne">助记审核</button>
+        <div class="group">语文</div>
+        <button type="button" data-view="apoems">诗词库</button>
+        <button type="button" data-view="apoets">诗人馆</button>
+        <div class="group">数学</div>
+        <button type="button" data-view="aknow">知识点</button>
+        <div class="group">以后加科目</div>
+        <button type="button" data-view="asubjects">科目与年级</button>
+        <div class="group">家长侧商业</div>
         <button type="button" data-view="amember">家庭会员</button>
         <button type="button" data-view="areset">重置与付费</button>
         <button type="button" data-view="agrowth">推广</button>
-        <div class="group">英语</div>
-        <button type="button" data-view="awords">词库管理</button>
-        <button type="button" data-view="alevels">闯关世界</button>
-        <button type="button" data-view="amne">助记审核</button>
-        <button type="button" data-view="alisten">磨耳朵专辑</button>
-        <div class="group">语文 / 数学</div>
-        <button type="button" data-view="apoems">诗词库</button>
-        <button type="button" data-view="apoets">诗人馆</button>
-        <button type="button" data-view="aknow">小学知识点</button>
       </aside>
       <main class="pc-main">
         <div class="view is-on" data-view="adash">
@@ -911,19 +960,24 @@ tr:hover td { background: #f8fafc; }
           </div>
         </div>
         <div class="view" data-view="akids">
-          <div class="toolbar"><input value="搜索孩子/家长"><select><option>小学 2 年级</option></select></div>
+          <p class="h">学生与家庭</p>
+          <p class="s">按孩子看，不按科目拆账号。一个家庭可以有多个孩子。</p>
+          <div class="toolbar"><input value="搜索孩子或家长"><select><option>全部年级</option><option>小学 2 年级</option></select></div>
           <table>
-            <tr><th>标题</th><th>作者</th><th>体裁</th><th>学生页结构</th><th>原文</th></tr>
-            <tr><td>静夜思</td><td>李白</td><td>五言绝句</td><td>标题 / 朝代作者 / 分行 / 直译 / 注释 / 背景 / 赏析</td><td><span class="tag green">已锁</span></td></tr>
-            <tr><td>春晓</td><td>孟浩然</td><td>五言绝句</td><td>同上，一句对一句</td><td><span class="tag green">已锁</span></td></tr>
-            <tr><td>赠汪伦</td><td>李白</td><td>七言绝句</td><td>扩展，仍按同一页结构</td><td><span class="tag green">已锁</span></td></tr>
+            <tr><th>孩子</th><th>年级</th><th>家庭</th><th>今天在学</th><th>状态</th></tr>
+            <tr><td>豆豆</td><td>二年级</td><td>妈妈</td><td>英语闯关 · 诗词 · 退位减法</td><td><span class="tag green">今日已学</span></td></tr>
+            <tr><td>安安</td><td>一年级</td><td>同一家庭</td><td>磨耳朵</td><td><span class="tag">只听</span></td></tr>
           </table>
-          <p class="s">目录按体裁分组。注释按年级缩短。争议字只给学生一条适龄说法，其余留在这里，不进朗诵。</p>
-          <div class="poem-host" data-poem-id="jing"></div>
-
+          <p class="s">进度重置要家长申请，在「重置与付费」里审。这里不能直接清空某一科。</p>
         </div>
         <div class="view" data-view="adata">
-          <p class="h">学习数据看板</p>
+          <p class="h">学习数据</p>
+          <div class="pills">
+            <button class="chip is-on" type="button" data-act="看全部科目。英语、语文、数学用同一张看板。">全部</button>
+            <button class="chip" type="button" data-act="只看英语：闯关、拍照、口评。">英语</button>
+            <button class="chip" type="button" data-act="只看语文：朗读和诗词纠错。">语文</button>
+            <button class="chip" type="button" data-act="只看数学：知识点通过率，不排名。">数学</button>
+          </div>
           <p class="s">只读运营可进。北星是周学习天数 ≥ 4 的学生占比。</p>
           <div class="kpis">
             <div class="kpi"><b>38%</b><span class="tiny">周 4 天习惯占比</span></div>
@@ -1031,6 +1085,43 @@ tr:hover td { background: #f8fafc; }
             <div class="item">别的孩子都开通了，再不买就落后。<span class="tag red">拒绝</span></div>
           </div>
           <button class="cta" type="button" data-closed="1" style="margin-top:12px">会员话术保持关闭</button>
+        </div>
+        <div class="view" data-view="aaudit">
+          <p class="h">审核中心</p>
+          <p class="s">所有科目的待审放在一个队列。按科目筛，不各做一套后台。</p>
+          <div class="pills">
+            <button class="chip is-on" type="button" data-act="看全部待审。英语、语文、数学都在这一列。">全部</button>
+            <button class="chip" type="button" data-act="只看英语：助记和造句。">英语</button>
+            <button class="chip" type="button" data-act="只看语文：纠错和赏析。原文仍锁定。">语文</button>
+            <button class="chip" type="button" data-act="只看数学：题型模板。不审学生的错题。">数学</button>
+          </div>
+          <table>
+            <tr><th>科目</th><th>类型</th><th>内容</th><th>状态</th></tr>
+            <tr><td>英语</td><td>助记</td><td>fork 画面联想</td><td><span class="tag orange">待审</span></td></tr>
+            <tr><td>英语</td><td>助记</td><td>apple 不当谐音</td><td><span class="tag red">拒绝</span></td></tr>
+            <tr><td>语文</td><td>纠错</td><td>静夜思「床」的说法</td><td><span class="tag orange">待审</span></td></tr>
+            <tr><td>数学</td><td>模板</td><td>退位减法 · 口算 10 题</td><td><span class="tag green">已上架</span></td></tr>
+          </table>
+          <p class="s">新科目以后也进这个队列，不新开审核系统。英语助记页只是这里筛到英语之后的快捷入口。</p>
+        </div>
+        <div class="view" data-view="asubjects">
+          <p class="h">科目与年级</p>
+          <p class="s">先建科目，再挂内容。学生端默认不出现新科目。课标内容不因新增科目被锁。</p>
+          <div class="toolbar"><button class="primary" type="button" data-sheet="新增科目" data-sub="只建名称和年级范围。学生端先不显示。">新增科目</button></div>
+          <table>
+            <tr><th>科目</th><th>学生入口</th><th>后台在管</th><th>状态</th></tr>
+            <tr><td>英语</td><td>听力海湾</td><td>词库、闯关、磨耳朵</td><td><span class="tag green">已开放</span></td></tr>
+            <tr><td>语文</td><td>诗词</td><td>诗词库、诗人馆</td><td><span class="tag green">已开放</span></td></tr>
+            <tr><td>数学</td><td>数理工坊</td><td>知识点、口算组卷</td><td><span class="tag green">已开放</span></td></tr>
+            <tr><td>科学</td><td>不显示</td><td>还没有内容类型</td><td><span class="tag">未开放</span></td></tr>
+          </table>
+          <div class="panel" style="margin-top:12px">
+            <p class="s">加一门新科目时只做这四步</p>
+            <div class="item">1. 在这里新建科目，状态先保持未开放。</div>
+            <div class="item">2. 选它要复用的能力：知识点、听读、闯关、图库。不复制会员和审核。</div>
+            <div class="item">3. 内容审核通过后，才在学生端打开入口。</div>
+            <div class="item">4. 学习数据仍用同一张看板，只多一个科目筛选。</div>
+          </div>
         </div>
         <div class="view" data-view="awords">
           <div class="toolbar"><input value="apple"><select><option>主题：食物</option></select><button class="primary" type="button" data-sheet="新增单词" data-sub="先入草稿，审核后才上架。">新增单词</button></div>
@@ -1310,7 +1401,14 @@ tr:hover td { background: #f8fafc; }
     const showVert = math.mode === "vert" && !hideFace && item.a != null;
     const showCmp = math.mode === "cmp";
     const kind = math.bank === "small" ? "20 以内退位" : "退位减法";
-    const follow = math.bank === "small" ? "先回退：20 以内退位 · 按知识点，不排名" : "二年级 · 退位减法 · 按知识点，不排名";
+    const gradeNow = root.dataset.grade || "g12";
+    const follow = gradeNow === "pre"
+      ? "学前 · 比一比多少 · 点大图，不排名"
+      : gradeNow === "g36"
+        ? (math.bank === "small" ? "四年级 · 可回看 20 以内 · 不排名" : "四年级 · 退位减法 · 做完可看正确率，不排名")
+        : gradeNow === "mid"
+          ? "初一 · 仍在补小学退位减法 · 不排初中新题"
+          : (math.bank === "small" ? "先回退：20 以内退位 · 按知识点，不排名" : "二年级 · 退位减法 · 按知识点，不排名");
     let progress = "第 " + Math.min(math.index + 1, 10) + " / 10 题 · 可停 · 不排名";
     if (math.mode === "unit") progress = "长度热身 · 不占今天这 10 题";
     if (math.index >= 10 && math.mode !== "unit") progress = "10 / 10 做完了 · 不排名";
@@ -1364,6 +1462,19 @@ tr:hover td { background: #f8fafc; }
       if (digits) digits.textContent = digitText;
       const hintEl = board.querySelector(".math-hint");
       if (hintEl) hintEl.textContent = hint;
+      if ((root.dataset.grade || "g12") === "pre") {
+        if (q) { q.hidden = false; q.textContent = "哪一堆苹果更多？"; }
+        if (vert) vert.hidden = true;
+        if (pad) pad.hidden = true;
+        if (digits) digits.hidden = true;
+        if (hintEl) hintEl.textContent = "点更多的那一堆。不用键盘。";
+        const modes = board.querySelector(".math-modes");
+        if (modes) modes.hidden = true;
+      } else if (digits) {
+        digits.hidden = false;
+        const modes = board.querySelector(".math-modes");
+        if (modes) modes.hidden = false;
+      }
     });
     fillPreview();
   }
@@ -1613,9 +1724,58 @@ tr:hover td { background: #f8fafc; }
     });
     toast('已按「' + sel.value + '」筛选');
   });
+
+  const GRADES = {
+    pre: { greet: "豆豆，来听", grade: "学前", sub: "今天听一个苹果", listen: "听苹果", play: "点一张图", read: "听静夜思", math: "比一比", cta: "继续今天 · 听苹果", note: "听完就可以。不用四件都做。", hint: "芽芽会读给你听。", mine: "豆豆 · 学前 · 连续 5 天", nav: ["星球", "听", "诗", "数"], pcGrade: "学前 · 连续 5 天", pcTitle: "先听一听", pcPanel: "继续今天：听苹果。听完就回星球。", parentGrade: "学前 · 已绑定", parentSet: "年级档：学前", parentPc: "当前孩子：豆豆 · 学前", battle: "听一听，点一张图", settle: "", today: "", mastery: "", point: "学前今天只比多少。下面的知识点还能看见，但不是今天的题。", parentCard: "豆豆这周主要是听苹果、听诗。页面不显示正确率。数学只比多少，不练退位减法。", toast: "现在看的是学前。按钮更大，不显示正确率。年级本身不能点。" },
+    g12: { greet: "下午好，豆豆", grade: "二年级", sub: "今天把好吃的灯塔再点亮一点", listen: "磨耳朵 1 段", play: "好吃的 第 3 关", read: "《静夜思》", math: "跟进：退位减法", cta: "继续今天 · 好吃的第 3 关", note: "没做完的优先。下面四件事可以稍后再点。", hint: "启芽建议：fork 还不稳，今天这条主路会先复习它，只要 3 分钟。", mine: "豆豆 · 小学 2 年级 · 连续 5 天", nav: ["星球", "英语", "诗词", "数学"], pcGrade: "小学 2 年级 · 连续 5 天", pcTitle: "打开就学", pcPanel: "继续今天：好吃的第 3 关还没做完。做完就回星球，不自动跳到诗词和数学。", parentGrade: "小学 2 年级 · 已绑定", parentSet: "年级档：小学 1-2 年级", parentPc: "当前孩子：豆豆 · 二年级", battle: "先在心里说出来，再选", settle: "", today: "", mastery: "", point: "自由点选，不锁关卡。今天的 10 题跟的是当前这个点。", parentCard: "豆豆这周新认识 18 个生活单词，正在点亮「好吃的」。数学卡在退位减法，建议回看 20 以内。错因里有看错，也有还不会。", toast: "现在看的是小学 1-2 年级，也就是豆豆现在的界面。" },
+    g36: { greet: "下午好，豆豆", grade: "四年级", sub: "先把 fork 复习完", listen: "磨耳朵 1 段", play: "复习 fork", read: "《静夜思》· 注释", math: "退位减法", cta: "继续今天 · 复习 fork", note: "下面这行是今天还剩的。做完这一条就先回星球。", hint: "主路是复习 fork。注释可以开，但不是必须读完。", mine: "豆豆 · 四年级 · 连续 5 天", nav: ["星球", "英语", "诗词", "数学"], pcGrade: "四年级 · 连续 5 天", pcTitle: "打开就学", pcPanel: "继续今天：复习 fork。做完就回星球，不自动跳到下一科。", parentGrade: "四年级 · 已绑定", parentSet: "年级档：小学 3-6 年级", parentPc: "当前孩子：豆豆 · 四年级", battle: "先在心里说出来，再选", settle: "这一关正确率 75%。不排名。", today: "今天还剩：复习 fork，看《静夜思》注释。做完主路就先回星球。", mastery: "", point: "四年级今天仍练退位减法。做完可以看正确率，不排名。低年级的点还能回去。", parentCard: "豆豆这周先复习 fork。诗词可以打开注释。数学仍是退位减法，做完可以看正确率，不排名。", toast: "现在看的是小学 3-6 年级。多了一行今天还剩什么，结算可以看正确率。" },
+    mid: { greet: "豆豆", grade: "初一", sub: "先复习还没稳的", listen: "复习听力", play: "复习 fork", read: "《静夜思》", math: "补小学退位", cta: "继续学习 · 复习 fork", note: "做完这一条就先停。不自动开下一科。", hint: "先复习没稳的词。装饰少一点，方便看掌握度。", mine: "豆豆 · 初一 · 连续 5 天", nav: ["星球", "英语", "诗词", "数学"], pcGrade: "初一 · 连续 5 天", pcTitle: "继续学习", pcPanel: "继续学习：复习 fork。做完这一条就先停。", parentGrade: "初一 · 已绑定", parentSet: "年级档：初中", parentPc: "当前孩子：豆豆 · 初一", battle: "先回忆词义，再选。这一关会计用时", settle: "掌握度 64% · 用时 6 分钟。不排名。", today: "今天还剩：复习 fork。做完这一条就先停。", mastery: "掌握度 64% · 用时 6 分钟。不排名，也不和别人比。", point: "初一今天补的是小学退位减法，不排初中新题。已经会的点还在。", parentCard: "豆豆这周先复习还没稳的词。数学仍在补小学退位减法，没有初中新题。可以看掌握度和用时，不排名。", toast: "现在看的是初中。装饰少了，主按钮是「继续学习」。数学仍补小学里没稳的点。" }
+  };
+  function applyGrade(name, quiet) {
+    const key = GRADES[name] ? name : "g12";
+    const g = GRADES[key];
+    root.dataset.grade = key;
+    root.querySelectorAll(".qs-grade button[data-grade]").forEach((el) => el.classList.toggle("is-on", el.dataset.grade === key));
+    const set = (sel, value) => root.querySelectorAll(sel).forEach((el) => { el.textContent = value; });
+    set(".slot-greet", g.greet);
+    set(".slot-grade", g.grade);
+    set(".slot-home-sub", g.sub);
+    set(".slot-task-listen", g.listen);
+    set(".slot-task-play", g.play);
+    set(".slot-task-read", g.read);
+    set(".slot-task-math", g.math);
+    set(".slot-cta", g.cta);
+    set(".slot-home-note", g.note);
+    set(".slot-home-hint", g.hint);
+    set(".slot-mine", g.mine);
+    set(".slot-nav-home", g.nav[0]);
+    set(".slot-nav-en", g.nav[1]);
+    set(".slot-nav-poem", g.nav[2]);
+    set(".slot-nav-math", g.nav[3]);
+    set(".slot-pc-grade", g.pcGrade);
+    set(".slot-pc-title", g.pcTitle);
+    set(".slot-pc-panel", g.pcPanel);
+    set(".slot-parent-grade", g.parentGrade);
+    set(".slot-parent-set", g.parentSet);
+    set(".slot-parent-pc", g.parentPc);
+    set(".slot-battle-lead", g.battle);
+    set(".slot-settle-extra", g.settle);
+    set(".slot-today", g.today);
+    set(".slot-mastery", g.mastery);
+    set(".slot-point-note", g.point);
+    set(".slot-parent-card", g.parentCard);
+    alias.listen = key === "pre" ? "listen" : "home";
+    const en = root.querySelector(".slot-nav-en");
+    if (en) en.dataset.view = key === "pre" ? "listen" : "map";
+    if (typeof renderMath === "function") renderMath();
+    if (!quiet) toast(g.toast);
+  }
+
   root.addEventListener('click', (e) => {
     if (e.target === sheet) { sheet.hidden = true; return; }
     if (handleMathClick(e)) return;
+    const gradeBtn = e.target.closest("[data-grade]");
+    if (gradeBtn && gradeBtn.closest(".qs-grade")) { applyGrade(gradeBtn.dataset.grade); return; }
 
     const opened = e.target.closest("[data-open-poem]");
     if (opened) {
@@ -1878,7 +2038,7 @@ tr:hover td { background: #f8fafc; }
     const btn = e.target.closest('button');
     if (btn && !btn.disabled) toast(btn.textContent.trim().slice(0, 28) || '已点到');
   });
-  renderMath();
+  applyGrade('g12', true);
 })();
 </script>
 </body>

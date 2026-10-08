@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.planet.wp.admin.module.business.qiya.dao.QiyaReportDao">
+
+    <select id="countStudent" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM t_qiya_student WHERE deleted_flag = 0
+    </select>
+
+    <select id="countPendingReview" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM t_qiya_review WHERE deleted_flag = 0 AND status_name = '草稿'
+    </select>
+
+    <select id="countReset" resultType="java.lang.Long">
+        SELECT IFNULL(SUM(reset_count), 0) FROM t_qiya_reset WHERE deleted_flag = 0
+    </select>
+
+    <select id="countPayScene" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM t_qiya_reset WHERE deleted_flag = 0 AND reset_kind = '付费场景'
+    </select>
+
+    <select id="sumHabit" resultType="java.lang.Long">
+        SELECT IFNULL(SUM(habit_count), 0) FROM t_qiya_channel WHERE deleted_flag = 0
+    </select>
+
+    <select id="latestReopenRate" resultType="java.lang.String">
+        SELECT reopen_rate
+        FROM t_qiya_channel
+        WHERE deleted_flag = 0
+          AND reopen_rate IS NOT NULL
+          AND reopen_rate != ''
+        ORDER BY channel_id DESC
+        LIMIT 1
+    </select>
+
+    <select id="latestOps" resultType="com.study.planet.wp.admin.module.business.qiya.domain.vo.OpsVO">
+        SELECT ops_id AS opsId,
+               today_task AS todayTask,
+               festival_name AS festivalName,
+               skin_name AS skinName,
+               member_open AS memberOpen
+        FROM t_qiya_ops
+        WHERE deleted_flag = 0
+        ORDER BY ops_id DESC
+        LIMIT 1
+    </select>
+
+    <select id="masteryList" resultType="com.study.planet.wp.admin.module.business.qiya.domain.vo.NameCountVO">
+        SELECT IFNULL(NULLIF(mastery, ''), '未填') AS name, COUNT(*) AS total
+        FROM t_qiya_word
+        WHERE deleted_flag = 0
+        GROUP BY IFNULL(NULLIF(mastery, ''), '未填')
+        ORDER BY total DESC
+    </select>
+</mapper>

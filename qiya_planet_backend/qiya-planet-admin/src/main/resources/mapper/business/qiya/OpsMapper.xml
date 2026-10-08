@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.planet.wp.admin.module.business.qiya.dao.OpsDao">
+    <select id="query" resultType="com.study.planet.wp.admin.module.business.qiya.domain.vo.OpsVO">
+        SELECT * FROM t_qiya_ops
+        <where>
+            deleted_flag = 0
+            <if test="query.searchWord != null and query.searchWord != ''">
+                AND (
+                INSTR(today_task, #{query.searchWord})
+                OR INSTR(festival_name, #{query.searchWord})
+                )
+            </if>
+        </where>
+        ORDER BY ops_id DESC
+    </select>
+</mapper>
