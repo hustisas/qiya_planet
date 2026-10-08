@@ -43,7 +43,7 @@ export const appDefaultConfig = {
   // 水印
   watermarkFlag: true,
   // 网站名称
-  websiteName: 'qiya_planet',
+  websiteName: '启芽星球',
   // 主题颜色
   primaryColor: '#1677ff',
   // 紧凑

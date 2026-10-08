@@ -22,6 +22,7 @@ let language = appDefaultConfig.language;
 if (appConfigStr) {
   try {
     state = JSON.parse(appConfigStr);
+    state.websiteName = appDefaultConfig.websiteName;
     language = state.language;
   } catch (e) {
     smartSentry.captureError(e);
