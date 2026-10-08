@@ -22,3 +22,33 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# Maven build output
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iws
+*.iml
+*.ipr
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+**/.vscode
+.DS_Store
+**/.DS_Store
+
+# frontend dependencies and build output
+**/node_modules
+**/dist
+**/dist-ssr
+**/unpackage
+*.local
+
+# local scratch notes, not product docs
+docs/_*.py
+docs/_*.txt

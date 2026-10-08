@@ -1,0 +1,1885 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>启芽星球 完整原型 · 学生 / 家长 / 管理后台</title>
+<style>* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #e8eef6; color: #16324f; }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+#qiya-studio { min-height: 100%; }
+.qs-bar { position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 12px 16px; background: #16324f; color: #fff; }
+.qs-bar h1 { margin: 0 12px 0 0; font-size: 16px; font-weight: 600; }
+.qs-bar button { border: 0; border-radius: 999px; padding: 7px 12px; background: #25527a; color: #fff; }
+.qs-bar button.is-on { background: #ff6b4a; }
+.qs-note { margin-left: auto; font-size: 12px; opacity: .8; }
+.qs-stage { display: none; padding: 20px; }
+.qs-stage.is-on { display: block; }
+.phone { width: 390px; margin: 0 auto; background: #111827; border-radius: 36px; padding: 12px 10px 16px; box-shadow: 0 22px 50px rgba(15,23,42,.28); }
+.phone-bar { display: flex; justify-content: space-between; color: #fff; font-size: 11px; padding: 0 12px 8px; }
+.capsule { border: 1px solid #4b5563; border-radius: 999px; padding: 2px 10px; }
+.screen-wrap { background: #fff; border-radius: 24px; height: 720px; overflow: hidden; position: relative; }
+.nav4 { position: absolute; left: 8px; right: 8px; bottom: 8px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.nav4 button { border: 0; border-radius: 12px; padding: 8px 0; background: #1f2937; color: #d1d5db; font-size: 12px; }
+.nav4 button.is-on { background: #fff; color: #111827; }
+.nav5 { position: absolute; left: 8px; right: 8px; bottom: 8px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.nav5 button { border: 0; border-radius: 12px; padding: 8px 2px; background: #1f2937; color: #d1d5db; font-size: 11px; }
+.nav5 button.is-on { background: #fff; color: #111827; }
+.cta[data-closed] { background: #cbd5e1; color: #475569; cursor: not-allowed; }
+.kid .screen-wrap { background: linear-gradient(180deg, #8ec5ff 0%, #d8f8ea 42%, #ffe7a3 100%); }
+.parent-app .screen-wrap { background: #f4f7fb; }
+.view { display: none; height: 100%; padding: 16px 16px 64px; overflow: auto; }
+.view.is-on { display: flex; flex-direction: column; gap: 10px; }
+.h { margin: 0; font-size: 22px; font-weight: 600; }
+.s { margin: 0; font-size: 12px; opacity: .75; }
+.row { display: flex; gap: 8px; align-items: center; justify-content: space-between; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.card, .ghost, .cta, .choice, .item { border: 0; border-radius: 16px; }
+.card, .item, .choice { background: #fff; padding: 10px; text-align: left; color: inherit; }
+.cta { background: #ff6b4a; color: #fff; padding: 12px; font-weight: 600; }
+.ghost { background: #fff; color: #16324f; padding: 12px; }
+.tiny { font-size: 11px; opacity: .7; display: block; }
+.planet { width: 84px; height: 84px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff7, #35c4a5 42%, #0f766e); box-shadow: inset -10px -12px 0 #0b3b36; }
+.pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.pills span, .chip { background: #fff; border-radius: 999px; padding: 4px 8px; font-size: 12px; }
+.warn { background: #ffedd5; }
+.ok { background: #dcfce7; }
+.avatar { width: 40px; height: 40px; border: 0; border-radius: 14px; background: #fff; }
+.q { margin: 0; font-size: 22px; text-align: center; font-weight: 600; }
+button.q, button.chip { border: 0; }
+button.q { background: transparent; width: 100%; }
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.choices button { min-height: 62px; }
+.right { background: #bbf7d0 !important; }
+.wrong { background: #fecaca !important; }
+.scene { height: 160px; border-radius: 18px; background: linear-gradient(#0b1b3a,#3b2d5c); position: relative; }
+.moon { position: absolute; right: 18px; top: 16px; width: 36px; height: 36px; border-radius: 50%; background: #fff3c4; }
+.poet { position: absolute; left: 24px; bottom: 16px; width: 54px; height: 70px; border-radius: 18px 18px 12px 12px; background: #f4d2a6; display: flex; align-items: end; justify-content: center; padding-bottom: 8px; }
+.pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.pad button { border: 0; background: #fff; border-radius: 14px; min-height: 42px; }
+.pc { max-width: 1180px; margin: 0 auto; background: #fff; border-radius: 16px; box-shadow: 0 18px 40px rgba(15,23,42,.12); overflow: hidden; min-height: 760px; display: flex; flex-direction: column; }
+.pc-top { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: #0f172a; color: #fff; font-size: 13px; }
+.pc-body { display: grid; grid-template-columns: 220px 1fr; min-height: 720px; }
+.pc-side { background: #f8fafc; border-right: 1px solid #e5e7eb; padding: 12px; }
+.pc-side button { width: 100%; text-align: left; border: 0; background: transparent; border-radius: 10px; padding: 10px 12px; margin-bottom: 4px; }
+.pc-side button.is-on { background: #d1fae5; color: #065f46; font-weight: 600; }
+.pc-main { padding: 18px; background: #f5f7fa; }
+.pc-main .view { height: auto; padding: 0 0 12px; overflow: visible; }
+.pc-main .view.is-on { display: block; }
+.admin .pc-body { grid-template-columns: 232px 1fr; }
+.admin-side { background: #001529; color: #fff; padding: 12px; }
+.admin-side .logo { padding: 10px 12px 16px; font-weight: 700; }
+.admin-side .group { font-size: 11px; opacity: .55; padding: 12px 12px 6px; }
+.admin-side button { width: 100%; text-align: left; border: 0; background: transparent; color: #d1d5db; border-radius: 8px; padding: 9px 12px; }
+.admin-side button.is-on { background: #1677ff; color: #fff; }
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.kpi { background: #fff; border-radius: 12px; padding: 14px; }
+.kpi b { display: block; font-size: 24px; }
+table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; font-size: 13px; }
+th, td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; text-align: left; }
+th { background: #f8fafc; color: #64748b; font-weight: 500; }
+.tag { display: inline-block; border-radius: 999px; padding: 2px 8px; font-size: 12px; background: #e2e8f0; }
+.tag.red { background: #fee2e2; color: #991b1b; }
+.tag.green { background: #dcfce7; color: #166534; }
+.tag.orange { background: #ffedd5; color: #9a3412; }
+.toolbar { display: flex; gap: 8px; margin: 0 0 12px; }
+.toolbar input, .toolbar select { border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 10px; background: #fff; }
+.primary { border: 0; background: #1677ff; color: #fff; border-radius: 8px; padding: 8px 12px; }
+.split { display: grid; grid-template-columns: 1.3fr .7fr; gap: 12px; }
+.panel { background: #fff; border-radius: 12px; padding: 14px; }
+.bar { height: 8px; background: #e5e7eb; border-radius: 99px; overflow: hidden; }
+.bar > i { display: block; height: 100%; background: #0f766e; }
+.hint { background: #fff9; border-radius: 14px; padding: 10px; font-size: 13px; text-align: center; }
+@media (max-width: 900px) {
+  .pc-body, .admin .pc-body, .split, .kpis { grid-template-columns: 1fr; }
+  .phone { width: 100%; max-width: 390px; }
+}
+
+button:focus-visible, .item:focus-visible, a:focus-visible { outline: 3px solid #0f766e; outline-offset: 2px; }
+.phone { background: linear-gradient(180deg,#1f2937,#0f172a); box-shadow: 0 28px 60px rgba(15,23,42,.35), inset 0 0 0 2px #334155; }
+.screen-wrap { box-shadow: inset 0 0 0 1px rgba(255,255,255,.4); }
+.phone-bar { letter-spacing: .04em; }
+.kid .screen-wrap { background:
+  radial-gradient(120px 80px at 80% 0%, rgba(255,255,255,.55), transparent 70%),
+  linear-gradient(180deg, #8ec5ff 0%, #d8f8ea 42%, #ffe7a3 100%); }
+.card, .item, .choice, .ghost, .cta, .kpi, .panel { box-shadow: 0 10px 24px rgba(22,50,79,.06); }
+button.card, button.item, button.ghost, button.cta, .pad button, .choices button, .chip { transition: transform .12s ease, box-shadow .12s ease; }
+button.card:active, button.item:active, button.ghost:active, button.cta:active, .pad button:active, .choices button:active { transform: translateY(1px) scale(.985); }
+.cta { box-shadow: 0 10px 18px rgba(255,107,74,.28); }
+.cta[data-closed] { background: #cbd5e1; color: #475569; box-shadow: none; }
+.scene { height: 168px; box-shadow: inset 0 -30px 40px rgba(0,0,0,.25); }
+.poet { box-shadow: 0 8px 0 #e7b98a; }
+.pc { border: 1px solid #e5e7eb; }
+.pc-side button:hover, .admin-side button:hover { background: rgba(15,118,110,.08); }
+.admin-side button:hover { background: rgba(255,255,255,.06); }
+tr { cursor: pointer; }
+tr:hover td { background: #f8fafc; }
+.item.is-pick, button.item.is-pick { outline: 2px solid #0f766e; }
+.is-play { outline: 2px solid #ff6b4a; }
+.qs-toast {
+  position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%);
+  max-width: min(520px, calc(100% - 32px));
+  background: #16324f; color: #fff; border-radius: 999px;
+  padding: 12px 16px; font-size: 14px; z-index: 40;
+  box-shadow: 0 12px 30px rgba(15,23,42,.28);
+}
+.qs-sheet {
+  position: fixed; inset: 0; z-index: 30; background: rgba(15,23,42,.45);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.qs-sheet[hidden] { display: none; }
+.qs-dialog { width: min(420px, 100%); background: #fff; color: #16324f; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.qs-dialog input { border: 1px solid #e5e7eb; border-radius: 12px; padding: 10px 12px; }
+
+
+.scene.slim { height: 88px; flex: none; }
+.poet { transition: transform .2s ease; }
+.poet.is-talk { transform: translateY(-8px); }
+.poem-back { align-self: flex-start; border: 0; background: transparent; color: #0f766e; padding: 0; font-weight: 700; }
+.poem-title { margin: 0; font-size: 28px; letter-spacing: .18em; }
+.poem-source { margin: 0; font-size: 14px; }
+.poem-source button { border: 0; background: transparent; color: #9a3412; font-weight: 700; padding: 0; }
+.poem-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.poem-tabs button { border: 0; border-radius: 999px; padding: 6px 10px; background: #fff; color: #16324f; }
+.poem-tabs button.is-on { background: #16324f; color: #fff; }
+.form-head { margin: 2px 0 0; font-size: 13px; font-weight: 700; }
+.poem-item { width: 100%; }
+.couplet { background: #fffaf3; border-radius: 16px; padding: 4px; }
+.verse { width: 100%; border: 0; background: transparent; text-align: left; padding: 6px 8px; border-radius: 12px; color: inherit; }
+.verse.is-on { background: #fff1ea; }
+.verse .py { display: block; font-size: 11px; letter-spacing: .04em; color: #9a3412; }
+.verse b { font-size: 18px; font-weight: 650; letter-spacing: .06em; }
+.py-off .py { display: none; }
+.poem-sec { background: #fff; border-radius: 14px; padding: 10px 12px; }
+.poem-sec[hidden] { display: none !important; }
+.note-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.note-row button { border: 0; border-radius: 999px; background: #fff7ed; padding: 6px 10px; }
+.note-row button.is-on { background: #fdba74; }
+.poem-split { grid-template-columns: .82fr 1.18fr; }
+.pc-main .couplet { display: flex; gap: 8px; }
+.pc-main .couplet .verse { flex: 1; }
+.poem-host .row { flex-wrap: wrap; }
+
+.big-q { font-size: 34px; line-height: 1.15; }
+.math-digits { margin: 0; min-height: 26px; text-align: center; font-size: 20px; font-weight: 700; }
+.vert-box { width: 7.5em; margin: 0 auto; font-size: 28px; font-weight: 700; text-align: right; line-height: 1.15; }
+.vert-line { border-top: 3px solid #16324f; margin: 4px 0 6px; }
+.math-modes .chip { padding: 6px 10px; }
+.math-modes .chip.is-on { background: #0f766e; color: #fff; }
+.math-cmp { grid-template-columns: repeat(3, 1fr); }
+.math-pad button { min-height: 44px; font-size: 18px; }
+.math-pad button[data-math-key="ok"] { background: #0f766e; color: #fff; font-weight: 700; }
+.listen-mask { margin: 0; text-align: center; font-size: 16px; font-weight: 600; }
+.math-preview { display: flex; flex-direction: column; gap: 6px; }
+.math-preview .item { width: 100%; }
+.math-cmp[hidden], .vert-box[hidden], .listen-mask[hidden], .math-heard[hidden], .math-why[hidden], .math-pad[hidden], .math-q[hidden] { display: none !important; }
+.finder { position: relative; flex: 1; min-height: 250px; border-radius: 22px; background: radial-gradient(circle at 50% 40%, #1e293b, #0f172a 70%); color: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.finder-frame { width: 78%; min-height: 62%; border: 2px dashed rgba(255,255,255,.75); border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; padding: 12px; }
+.finder-frame b, .look-emoji, .cam-shot { font-size: 64px; line-height: 1; }
+.finder-frame p, .finder.looking p { margin: 0; font-size: 16px; }
+.finder.looking { flex-direction: column; gap: 12px; }
+.looking .look-emoji { animation: qiya-look 1.1s ease-in-out infinite; }
+@keyframes qiya-look { 50% { transform: scale(1.08); } }
+@media (prefers-reduced-motion: reduce) { .looking .look-emoji { animation: none; } }
+.cam-bar { display: grid; grid-template-columns: 1fr 84px 1fr; gap: 10px; align-items: center; }
+.cam-bar button { border: 0; background: #fff; color: #16324f; border-radius: 16px; min-height: 52px; }
+.cam-bar button.is-pick { outline: 3px solid #ff6b4a; }
+.shutter { width: 84px; height: 84px; border-radius: 50% !important; border: 6px solid #ff6b4a !important; font-weight: 700; font-size: 18px; }
+.cam-shot { height: 108px; display: flex; align-items: center; justify-content: center; }
+.pick-cands .chip.is-on { background: #0f766e; color: #fff; }
+.cam-page { display: flex; flex-direction: column; gap: 10px; }
+.pc-main .finder { min-height: 320px; flex: none; }
+</style>
+</head>
+<body>
+<div id="qiya-studio">
+  <div class="qs-bar">
+    <h1>启芽星球原型</h1>
+    <button type="button" class="is-on" data-end="student-app">学生 App</button>
+    <button type="button" data-end="parent-app">家长 App</button>
+    <button type="button" data-end="student-pc">学生 PC</button>
+    <button type="button" data-end="parent-pc">家长 PC</button>
+    <button type="button" data-end="admin">管理后台</button>
+    <span class="qs-note">点击端和页面即可切换 · 数据为演示账号「豆豆」 · 拍照从取景开始</span>
+  </div>
+
+<section class="qs-stage is-on" data-end="student-app">
+  <div class="phone kid">
+    <div class="phone-bar"><span>9:41</span><span class="capsule">启芽星球 · 学生</span><span>●●●</span></div>
+    <div class="screen-wrap">
+      <div class="view is-on" data-view="home">
+        <div class="row"><div><p class="h">下午好，豆豆</p><p class="s">今天把好吃的灯塔再点亮一点</p></div><button class="avatar" type="button" data-view="mine">🌱</button></div>
+        <div class="row"><div class="planet"></div><span class="chip">连续探险 5 天</span></div>
+        <div class="grid2">
+          <button class="card" type="button" data-view="listen"><span class="tiny">听一听</span><b>磨耳朵 1 段</b></button>
+          <button class="card" type="button" data-view="map"><span class="tiny">闯一闯</span><b>好吃的 第 3 关</b></button>
+          <button class="card" type="button" data-view="poem" data-open-poem="jing"><span class="tiny">读一读</span><b>《静夜思》</b></button>
+          <button class="card" type="button" data-view="math"><span class="tiny">练一练</span><b>跟进：退位减法</b></button>
+        </div>
+        <button class="cta" type="button" data-view="battle">继续今天 · 好吃的第 3 关</button>
+        <p class="s">没做完的优先。下面四件事可以稍后再点。</p>
+        <div class="hint">启芽建议：fork 还不稳，今天这条主路会先复习它，只要 3 分钟。</div>
+      </div>
+      <div class="view" data-view="map">
+        <div class="row"><div><p class="h">听力海湾</p><p class="s">点亮主题世界，把词收进单词本</p></div><button class="avatar" type="button" data-view="book">本</button></div>
+        <div class="grid2">
+          <button class="card ok" type="button" data-act="我家已经点亮。可以再复习，进度不会被清空。">🏠<b> 我家</b><span class="tiny">3 星通关</span></button>
+          <button class="card" type="button" data-view="battle" style="outline:2px solid #ff6b4a">🍎<b> 好吃的</b><span class="tiny">第 3 / 6 关</span></button>
+          <button class="card" type="button" data-act="小动物还没解锁。先把好吃的闯完，这里不能付费提前打开。">🐱<b> 小动物</b><span class="tiny">未解锁</span></button>
+          <button class="card" type="button" data-act="彩虹颜色还没解锁。基础世界要一个一个点亮。">🎨<b> 彩虹颜色</b><span class="tiny">未解锁</span></button>
+          <button class="card" type="button" data-act="去学校还没解锁。先完成好吃的。">🏫<b> 去学校</b><span class="tiny">未解锁</span></button>
+          <button class="cta" type="button" data-view="photocam">拍照收词</button>
+        </div>
+        <button class="cta" type="button" data-view="battle">开始闯关</button>
+      </div>
+      <div class="view" data-view="battle">
+        <div class="row"><span>修理袋 1</span><span>4 / 8</span><span>★ 2</span></div>
+        <p class="s" style="text-align:center">先在心里说出来，再选</p>
+        <p class="q">听一听，哪张图是 apple？</p>
+        <button class="ghost" type="button" data-act="正在播放 apple。先在心里说出来，再选。">🔊 apple</button>
+        <div class="choices" id="kid-choices">
+          <button type="button" data-ok="1">🍎 苹果</button>
+          <button type="button">🍌 香蕉</button>
+          <button type="button">🥛 牛奶</button>
+          <button type="button">🍞 面包</button>
+        </div>
+        <div class="hint">修理袋：fork 本关结束前还会再出现一次</div>
+        <div class="hint" id="kid-hint" hidden>记忆贝壳：apple 是红苹果砸在桌上，叮！</div>
+      </div>
+      <div class="view" data-view="settle">
+        <p class="h">灯塔亮了两颗星</p>
+        <p class="q">★ ★ ☆</p>
+        <div class="card"><p class="s">新会的词</p><div class="pills"><span>apple</span><span>cup</span><span>plate</span></div><p class="s">还要再修</p><div class="pills"><span class="warn">fork</span></div></div>
+        <p class="s">明天会遇见 fork。先回星球也算今天完成。</p>
+        <button class="cta" type="button" data-view="home">回星球</button>
+        <button class="ghost" type="button" data-view="map">还想再闯一关</button>
+      </div>
+      <div class="view" data-view="book">
+        <p class="h">我的单词本</p>
+        <div class="pills" id="book-tabs">
+          <button class="chip" type="button" data-tab="learning">闯关中</button>
+          <button class="chip" type="button" data-tab="photo">拍照词</button>
+          <button class="chip" type="button" data-tab="hard">困难词</button>
+          <button class="chip" type="button" data-tab="done">已掌握</button>
+        </div>
+        <div class="card item" data-panel="learning"><b>apple</b><span class="tiny">苹果 · 灯 2/3</span></div>
+        <div class="card item" data-panel="learning"><b class="live-word">cup</b><span class="tiny"><span class="live-zh">杯子</span> · 拍照词</span></div>
+        <div class="card item" data-panel="photo" hidden><b class="live-word">cup</b><span class="tiny"><span class="live-zh">杯子</span> · 今天 16:02 拍的</span></div>
+        <div class="card item" data-panel="photo" hidden><b>lamp</b><span class="tiny">昨天 · 台灯</span></div>
+        <div class="card item" data-panel="hard" hidden><b>fork</b><span class="tiny">错 2 次 · 明天复习</span></div>
+        <div class="card item" data-panel="done" hidden><b>cat</b><span class="tiny">已点亮</span></div>
+        <button class="cta" type="button" data-view="battle">复习这些词</button>
+      </div>
+      <div class="view" data-view="photocam">
+        <div class="row"><button class="ghost" type="button" data-view="map">返回</button><span class="chip">还可拍 1 次</span></div>
+        <div class="finder"><div class="finder-frame"><b>☕</b><p>拍一件东西</p></div></div>
+        <p class="hint">放在框中间。只拍一件，不要拍人脸。</p>
+        <div class="cam-bar">
+          <button type="button" data-photo="album">相册</button>
+          <button class="shutter" type="button" data-photo="shoot" aria-label="拍照">拍</button>
+          <button type="button" data-photo="flash">手电</button>
+        </div>
+        <button class="ghost" type="button" data-photo="blur">演示：拍糊了</button>
+      </div>
+      <div class="view" data-view="photolook">
+        <div class="finder looking"><b class="look-emoji">☕</b><p>芽芽在看这是什么</p></div>
+        <p class="s">看完会自己出现候选。也可以取消，取消不算次数。</p>
+        <button class="cta" type="button" data-photo="ready">芽芽看完了</button>
+        <button class="ghost" type="button" data-photo="cancel">取消</button>
+      </div>
+      <div class="view" data-view="photopick">
+        <p class="s">今天 2/3 · 点一个你认得的，不用重拍</p>
+        <div class="card cam-shot pick-emoji">☕</div>
+        <p class="q pick-word">cup</p>
+        <p class="hint pick-line">/kʌp/  杯子<br>I see a cup on the table.</p>
+        <div class="pills pick-cands">
+          <button class="chip is-on" type="button" data-cand="cup">杯子 cup</button>
+          <button class="chip" type="button" data-cand="mug">茶杯 mug</button>
+          <button class="chip" type="button" data-cand="bowl">碗 bowl</button>
+        </div>
+        <button class="cta" type="button" data-photo="keep">就是这个</button>
+        <button class="ghost" type="button" data-view="photocam">都不是，再拍一张</button>
+      </div>
+      <div class="view" data-view="photoblur">
+        <p class="h">再拍清楚一点</p>
+        <p class="s">芽芽没看清。这次不占拍照次数。</p>
+        <div class="card">离近一点，只拍一件东西。不要拍人脸。</div>
+        <button class="cta" type="button" data-view="photocam">再拍一张</button>
+        <button class="ghost" type="button" data-view="battle">去闯关</button>
+      </div>
+      <div class="view" data-view="photo">
+        <p class="s">已确认 · 放进好吃的，不新开世界</p>
+        <div class="card cam-shot photo-emoji">☕</div>
+        <p class="q photo-word">cup</p>
+        <p class="hint photo-line">/kʌp/  杯子<br>I see a cup on the table.</p>
+        <div class="row"><button class="ghost" type="button" data-act="正在播放标准音。可以再听一遍。">听一听</button><button class="ghost" type="button" data-act="听到了。二年级先鼓励读完，不显示分数，也不出现价格。">跟我读</button></div>
+        <button class="cta" type="button" data-view="battle">用它闯一关</button>
+        <button class="ghost" type="button" data-view="book">放入单词本</button>
+        <button class="ghost" type="button" data-view="photocam">再拍一张</button>
+        <button class="ghost" type="button" data-view="photolimit">演示：今天拍照用完</button>
+        <button class="ghost" type="button" data-view="speaklimit">演示：跟读次数用完</button>
+      </div>
+      <div class="view" data-view="photolimit">
+        <p class="h">今天拍照用完了</p>
+        <p class="s">先去闯关或听一听</p>
+        <div class="card">闯关和磨耳朵还能继续。这一页不显示价格。</div>
+        <button class="cta" type="button" data-view="battle">去闯关</button>
+        <button class="ghost" type="button" data-view="listen">听一听</button>
+        <button class="ghost" type="button" data-view="photogate">告诉爸爸妈妈</button>
+      </div>
+      <div class="view" data-view="speaklimit">
+        <p class="h">今天跟读先听到这里</p>
+        <p class="s">闯关和磨耳朵还能继续</p>
+        <div class="card">可以再听标准音。这一页不显示价格，也不能购买。</div>
+        <button class="cta" type="button" data-view="battle">去闯关</button>
+        <button class="ghost" type="button" data-view="listen">磨耳朵</button>
+        <button class="ghost" type="button" data-view="photogate">告诉爸爸妈妈</button>
+      </div>
+      <div class="view" data-view="photogate">
+        <p class="h">请爸爸妈妈来</p>
+        <p class="s">先做一道口算。这里没有价格。</p>
+        <p class="q">8 + 6 = ?</p>
+        <div class="choices">
+          <button type="button" data-gate="0">12</button>
+          <button type="button" data-gate="1">14</button>
+          <button type="button" data-gate="0">15</button>
+          <button type="button" data-gate="0">16</button>
+        </div>
+        <p class="hint" id="gate-result" hidden></p>
+        <button class="ghost" type="button" data-view="battle">去闯关</button>
+      </div>
+      <div class="view" data-view="poet">
+        <p class="h">诗词</p>
+        <p class="s">先按体裁找。课内的排在前面，不一次铺开很多首。</p>
+        <div class="poem-tabs">
+          <button type="button" class="is-on" data-form="all">全部</button>
+          <button type="button" data-form="wu">五言绝句</button>
+          <button type="button" data-form="qi">七言绝句</button>
+        </div>
+        <p class="form-head" data-poem-form="wu">五言绝句</p>
+        <button class="item poem-item" type="button" data-view="poem" data-open-poem="jing" data-poem-form="wu"><span><b>静夜思</b><span class="tiny">唐代 · 李白 · 课内</span></span><span class="tiny">打开</span></button>
+        <button class="item poem-item" type="button" data-view="poem" data-open-poem="chun" data-poem-form="wu"><span><b>春晓</b><span class="tiny">唐代 · 孟浩然 · 课内</span></span><span class="tiny">打开</span></button>
+        <p class="form-head" data-poem-form="qi">七言绝句</p>
+        <button class="item poem-item" type="button" data-view="poem" data-open-poem="song" data-poem-form="qi"><span><b>赠汪伦</b><span class="tiny">唐代 · 李白 · 扩展</span></span><span class="tiny">打开</span></button>
+      </div>
+      <div class="view" data-view="poem">
+        <button class="poem-back" type="button" data-view="poet">返回目录</button>
+        <div class="poem-host" data-poem-id="jing"></div>
+      </div>
+            <div class="view" data-view="math" data-math-board="1">
+        <p class="h">数理工坊 · 口算</p>
+        <p class="s math-follow">二年级 · 退位减法 · 按知识点，不排名</p>
+        <div class="pills math-modes">
+          <button class="chip is-on" type="button" data-math-mode="oral">口算</button>
+          <button class="chip" type="button" data-math-mode="vert">竖式</button>
+          <button class="chip" type="button" data-math-mode="listen">听算</button>
+          <button class="chip" type="button" data-math-mode="cmp">比大小</button>
+          <button class="chip" type="button" data-math-mode="unit">厘米和米</button>
+        </div>
+        <p class="s math-progress">第 1 / 10 题 · 可停 · 不排名</p>
+        <div class="bar"><i class="math-bar" style="width:10%"></i></div>
+        <p class="q big-q math-q">32 − 17 = ?</p>
+        <div class="vert-box" hidden>
+          <div class="vert-a">32</div>
+          <div class="vert-b">− 17</div>
+          <div class="vert-line"></div>
+          <div class="vert-ans">?</div>
+        </div>
+        <p class="listen-mask" hidden>芽芽在读题。可以先答，也可以点「我听到了」再看题。</p>
+        <p class="math-digits">点数字作答</p>
+        <p class="hint math-hint">个位不够减，向十位借 1。</p>
+        <div class="pills math-why" hidden>
+          <button class="chip" type="button" data-why="slip">看错了</button>
+          <button class="chip" type="button" data-why="gap">还不会</button>
+          <button class="chip" type="button" data-why="fast">算太快</button>
+        </div>
+        <div class="choices math-cmp" hidden>
+          <button type="button" data-cmp="&gt;">大于</button>
+          <button type="button" data-cmp="&lt;">小于</button>
+          <button type="button" data-cmp="=">等于</button>
+        </div>
+        <button class="ghost math-heard" type="button" data-math-heard="1" hidden>我听到了</button>
+        <div class="pad math-pad">
+          <button type="button" data-math-key="1">1</button><button type="button" data-math-key="2">2</button><button type="button" data-math-key="3">3</button>
+          <button type="button" data-math-key="4">4</button><button type="button" data-math-key="5">5</button><button type="button" data-math-key="6">6</button>
+          <button type="button" data-math-key="7">7</button><button type="button" data-math-key="8">8</button><button type="button" data-math-key="9">9</button>
+          <button type="button" data-math-key="del">删</button><button type="button" data-math-key="0">0</button><button type="button" data-math-key="ok">✓</button>
+        </div>
+        <div class="pills">
+          <button class="chip" type="button" data-math-buddy="1">和芽芽比一比</button>
+          <button class="chip" type="button" data-math-photo="1">拍下我写的</button>
+          <button class="chip" type="button" data-math-stop="1">先停在这里</button>
+        </div>
+        <button class="ghost" type="button" data-view="points">换个知识点</button>
+        <button class="ghost" type="button" data-math-finish="1">演示：这组做完</button>
+      </div>
+      <div class="view" data-view="mreport">
+        <p class="h">今天这组练完</p>
+        <p class="s math-report">还没做完。</p>
+        <div class="card">没有名次，也不和别的小朋友比。明天还练这个点。</div>
+        <button class="cta" type="button" data-math-reset="1">再来一组</button>
+        <button class="ghost" type="button" data-view="home">回星球</button>
+      </div>
+      <div class="view" data-view="points">
+        <p class="h">小学知识点</p>
+        <p class="s">自由点选，不锁关卡。今天的 10 题跟的是当前这个点。</p>
+        <button class="item is-pick" type="button" data-math-point="main" data-view="math" data-act="当前跟进：退位减法。"><b>退位减法</b><span class="tiny">二年级 · 当前跟进</span></button>
+        <button class="item" type="button" data-math-point="fallback" data-view="math" data-act="先回去修 20 以内退位。今天这组换成更小的数。"><b>20 以内退位</b><span class="tiny">一年级 · 建议回退</span></button>
+        <button class="item" type="button" data-math-point="later" data-act="表内乘法已经较熟，今天先不加新题。"><b>表内乘法</b><span class="tiny">二年级 · 已掌握</span></button>
+        <button class="item" type="button" data-math-point="later" data-act="分数加法还没学。不会跳到三年级。"><b>分数加法</b><span class="tiny">三年级 · 未学</span></button>
+      </div>
+      <div class="view" data-view="listen">
+        <p class="h">磨耳朵电台</p>
+        <button class="card" type="button" data-act="正在播放厨房里的苹果。播完可以回星球，不自动开下一科。">🍳 厨房里的苹果<span class="tiny">1:20 / 2:46 · 可跟读</span></button>
+        <button class="cta" type="button" data-view="home">听完回星球</button>
+      </div>
+      <div class="view" data-view="mine">
+        <p class="h">成长舱</p>
+        <div class="card">豆豆 · 小学 2 年级 · 连续 5 天</div>
+        <button class="item" type="button" data-view="book">单词本 · 18 个新词</button>
+        <button class="item" type="button" data-view="points">数学跟进 · 退位减法</button>
+        <div class="hint">家长中心请让爸爸妈妈从「家长 App」进入</div>
+      </div>
+      <nav class="nav4">
+        <button class="is-on" type="button" data-view="home">星球</button>
+        <button type="button" data-view="map">英语</button>
+        <button type="button" data-view="poet">诗词</button>
+        <button type="button" data-view="math">数学</button>
+      </nav>
+    </div>
+  </div>
+</section>
+
+<section class="qs-stage" data-end="parent-app">
+  <div class="phone parent-app">
+    <div class="phone-bar"><span>9:41</span><span class="capsule">启芽星球 · 家长</span><span>●●●</span></div>
+    <div class="screen-wrap">
+      <div class="view is-on" data-view="phome">
+        <p class="h">豆豆这周</p>
+        <p class="s">小学 2 年级 · 已绑定</p>
+        <div class="card">豆豆这周新认识 18 个生活单词。英语薄弱：fork（听音错 2 次）。数学薄弱：退位减法，建议回看 20 以内，不要加难度。错因：看错 4 次，还不会 2 次。</div>
+        <button class="ghost" type="button" data-view="pfollow">查看建议与跟进点</button>
+        <button class="ghost" type="button" data-view="pmember">家庭会员 · 暂未开放</button>
+        <div class="grid2">
+          <div class="card"><b>86 分钟</b><span class="tiny">学习时长</span></div>
+          <div class="card"><b>5 天</b><span class="tiny">连续探险</span></div>
+          <div class="card"><b>18</b><span class="tiny">新词</span></div>
+          <div class="card"><b>68%</b><span class="tiny">退位减法</span></div>
+        </div>
+        <button class="cta" type="button" data-view="pfollow">调整数学跟进点</button>
+      </div>
+      <div class="view" data-view="pwords">
+        <p class="h">单词与闯关</p>
+        <div class="item"><b>apple / cup / plate</b><span class="tiny">已较熟</span></div>
+        <div class="item"><b>fork</b><span class="tiny">困难词 · 明天复习</span></div>
+        <div class="item"><b>好吃的</b><span class="tiny">第 3 / 6 关 · 2 星</span></div>
+        <button class="ghost" type="button" data-act="已整理今日新词：apple、cup、plate。这是演示，不会下载文件。">导出今日新词</button>
+      </div>
+      <div class="view" data-view="pfollow">
+        <p class="h">数学跟进</p>
+        <p class="s">跟小学知识点，不绑教材章节</p>
+        <button class="item is-pick" type="button" data-math-point="main" data-act="当前跟进仍是退位减法。"><b>✓ 退位减法</b><span class="tiny">当前跟进</span></button>
+        <button class="item" type="button" data-math-point="fallback" data-act="已建议回退到 20 以内。学生端不会被锁住。"><b>20 以内退位</b><span class="tiny">建议回退</span></button>
+        <button class="item" type="button" data-math-point="later" data-act="表内乘法先不练。不会因此跳到后面的知识点。"><b>表内乘法</b><span class="tiny">已掌握，可先不练</span></button>
+        <div class="hint">挑战档仍停在小学该点，不会跳到初中。</div>
+        <p class="s math-preview-title">今日 10 题 · 退位减法 · 不绑教材</p>
+        <div class="math-preview"></div>
+        <button class="ghost" type="button" data-act="已整理今日 10 题打印草稿。这是演示，不会下载文件，页面上也不标价。">打印今日 10 题</button>
+        <p class="s">孩子端没有价格，这组也不锁。</p>
+      </div>
+      <div class="view" data-view="pset">
+        <p class="h">计划与隐私</p>
+        <button class="item" type="button" data-toggle="1">每日时长上限 25 分钟</button>
+        <button class="item" type="button" data-toggle="1">助记文字梗：开</button>
+        <button class="item" type="button" data-toggle="1">允许拍照识词：开</button>
+        <button class="item" type="button" data-toggle="1">晚 21:30 后只开磨耳朵</button>
+        <button class="item" type="button" data-toggle="1">跨岛漂流瓶：开，每天最多 1 个</button>
+        <button class="item" type="button" data-toggle="1">年级档：小学 1-2 年级</button>
+      </div>
+      <div class="view" data-view="pphoto">
+        <p class="h">拍照记录</p>
+        <p class="s">只看认过的词。原图不长期保存，也不认人脸。</p>
+        <div class="item"><b><span class="live-word">cup</span> <span class="live-zh">杯子</span></b><span class="tiny">今天 16:02 · 已入关</span></div>
+        <div class="item"><b>lamp 台灯</b><span class="tiny">昨天 · 已收藏</span></div>
+      </div>
+      <div class="view" data-view="pmember">
+        <p class="h">家庭会员</p>
+        <p class="s">先看免费能学什么，再看今天还剩几次</p>
+        <div class="card">一直免费：课标诗词、小学知识点、基础英语世界（我家 / 好吃的 / 小动物）、闯关、磨耳朵。</div>
+        <div class="item"><b>拍照 2/3</b><span class="tiny">今天还可拍 1 次</span></div>
+        <div class="item"><b>口评 5/5</b><span class="tiny">今天跟读口评已用完，听和闯关不锁</span></div>
+        <div class="card">收费前仍可看 3 条建议。收费后免费保留 1 条建议和 1 个薄弱点，图谱不锁。</div>
+        <button class="cta" type="button" data-closed="1">暂未开放</button>
+        <p class="s">月卡、年卡以后是道具直购。不展示代币，不自动续费。孩子端不显示价格。</p>
+      </div>
+      <nav class="nav5">
+        <button class="is-on" type="button" data-view="phome">概览</button>
+        <button type="button" data-view="pwords">单词</button>
+        <button type="button" data-view="pfollow">数学</button>
+        <button type="button" data-view="pmember">会员</button>
+        <button type="button" data-view="pset">设置</button>
+      </nav>
+    </div>
+  </div>
+</section>
+
+<section class="qs-stage" data-end="student-pc">
+  <div class="pc">
+    <div class="pc-top"><span>启芽星球 学习机 · 豆豆</span><span>小学 2 年级 · 连续 5 天</span></div>
+    <div class="pc-body">
+      <aside class="pc-side">
+        <button class="is-on" type="button" data-view="shome">今日探险</button>
+        <button type="button" data-view="smap">英语闯关</button>
+        <button type="button" data-view="sbook">单词本</button>
+        <button type="button" data-view="spoet">诗词仙山</button>
+        <button type="button" data-view="smath">数理工坊</button>
+        <button type="button" data-view="slisten">磨耳朵</button>
+      </aside>
+      <main class="pc-main">
+        <div class="view is-on" data-view="shome">
+          <p class="h">打开就学</p>
+          <div class="kpis">
+            <button class="kpi" type="button" data-view="slisten"><b>听一听</b><span class="tiny">厨房里的苹果</span></button>
+            <button class="kpi" type="button" data-view="sbattle"><b>闯一闯</b><span class="tiny">好吃的 第 3 关</span></button>
+            <button class="kpi" type="button" data-view="spoet" data-open-poem="jing"><b>读一读</b><span class="tiny">静夜思</span></button>
+            <button class="kpi" type="button" data-view="smath"><b>练一练</b><span class="tiny">退位减法</span></button>
+          </div>
+          <div class="panel" style="margin-top:12px">继续今天：好吃的第 3 关还没做完。做完就回星球，不自动跳到诗词和数学。</div>
+        </div>
+            <div class="view" data-view="smap">
+          <div class="split">
+            <div class="panel">
+              <p class="h">听力海湾地图</p>
+              <div class="grid2" style="margin-top:12px">
+                <div class="card ok">我家 · 已通关</div>
+                <div class="card" style="outline:2px solid #ff6b4a">好吃的 · 进行中</div>
+                <div class="card">小动物 · 未解锁</div>
+                <div class="card">去学校 · 未解锁</div>
+              </div>
+              <button class="cta" type="button" data-view="sbattle" style="margin-top:12px">开始第 3 关</button>
+              <button class="ghost" type="button" data-view="spcam" style="margin-top:8px">拍照收词</button>
+            </div>
+            <div class="panel"><p class="s">今日到期复习</p><div class="item">fork</div><div class="item">cup</div><button class="ghost" type="button" data-view="sbook">打开单词本</button></div>
+          </div>
+        </div>
+        <div class="view" data-view="spcam">
+          <div class="panel cam-page">
+            <div class="row"><p class="h">拍照收词</p><span class="chip">还可拍 1 次</span></div>
+            <div class="finder"><div class="finder-frame"><b>☕</b><p>拍一件东西</p></div></div>
+            <p class="hint">放在框中间。只拍一件，不要拍人脸。</p>
+            <div class="cam-bar">
+              <button type="button" data-photo="album">相册</button>
+              <button class="shutter" type="button" data-photo="shoot" aria-label="拍照">拍</button>
+              <button type="button" data-photo="flash">手电</button>
+            </div>
+            <button class="ghost" type="button" data-photo="blur">演示：拍糊了</button>
+          </div>
+        </div>
+        <div class="view" data-view="splook">
+          <div class="panel cam-page">
+            <div class="finder looking"><b class="look-emoji">☕</b><p>芽芽在看这是什么</p></div>
+            <button class="cta" type="button" data-photo="ready">芽芽看完了</button>
+            <button class="ghost" type="button" data-photo="cancel">取消</button>
+          </div>
+        </div>
+        <div class="view" data-view="sppick">
+          <div class="panel cam-page">
+            <p class="s">今天 2/3 · 点一个你认得的，不用重拍</p>
+            <div class="card cam-shot pick-emoji">☕</div>
+            <p class="q pick-word">cup</p>
+            <p class="hint pick-line">/kʌp/  杯子<br>I see a cup on the table.</p>
+            <div class="pills pick-cands">
+              <button class="chip is-on" type="button" data-cand="cup">杯子 cup</button>
+              <button class="chip" type="button" data-cand="mug">茶杯 mug</button>
+              <button class="chip" type="button" data-cand="bowl">碗 bowl</button>
+            </div>
+            <button class="cta" type="button" data-photo="keep">就是这个</button>
+            <button class="ghost" type="button" data-view="spcam">都不是，再拍一张</button>
+          </div>
+        </div>
+        <div class="view" data-view="spblur">
+          <div class="panel">
+            <p class="h">再拍清楚一点</p>
+            <p class="s">芽芽没看清。这次不占拍照次数。不展示模型猜的词。</p>
+            <button class="cta" type="button" data-view="spcam">再拍一张</button>
+            <button class="ghost" type="button" data-view="sbattle">去闯关</button>
+          </div>
+        </div>
+        <div class="view" data-view="sphoto">
+          <div class="panel cam-page">
+            <p class="s">已确认 · 放进好吃的，不新开世界</p>
+            <div class="card cam-shot photo-emoji">☕</div>
+            <p class="q photo-word">cup</p>
+            <p class="hint photo-line">/kʌp/  杯子<br>I see a cup on the table.</p>
+            <div class="row"><button class="ghost" type="button" data-act="正在播放标准音。可以再听一遍。">听一听</button><button class="ghost" type="button" data-act="听到了。二年级先鼓励读完，不显示分数，也不出现价格。">跟我读</button></div>
+            <button class="cta" type="button" data-view="sbattle">用它闯一关</button>
+            <button class="ghost" type="button" data-view="sbook">放入单词本</button>
+            <button class="ghost" type="button" data-view="spcam">再拍一张</button>
+          </div>
+        </div>
+        <div class="view" data-view="sbattle">
+          <div class="split">
+            <div class="panel">
+              <p class="s">先在心里说出来。修理袋里还有 fork。</p>
+              <p class="q">哪张图是 apple？</p>
+              <div class="choices" id="pc-choices">
+                <button type="button" data-ok="1">🍎 苹果</button>
+                <button type="button">🍌 香蕉</button>
+                <button type="button">🥛 牛奶</button>
+                <button type="button">🍞 面包</button>
+              </div>
+            </div>
+            <div class="panel"><b>apple</b><p class="s">/ˈæpl/ 苹果</p><p>记忆贝壳：红苹果砸在桌上，叮！</p></div>
+          </div>
+        </div>
+        <div class="view" data-view="sbook">
+          <p class="h">单词本</p>
+          <table><tr><th>单词</th><th>来源</th><th>掌握</th><th>下次复习</th></tr>
+            <tr><td>apple</td><td>闯关</td><td>学习中</td><td>明天</td></tr>
+            <tr><td>cup</td><td>拍照</td><td>学习中</td><td>今天</td></tr>
+            <tr><td>fork</td><td>困难词</td><td>不稳定</td><td>明天</td></tr>
+            <tr><td>cat</td><td>我家</td><td>已掌握</td><td>15 天后</td></tr>
+          </table>
+        </div>
+        <div class="view" data-view="spoet">
+          <div class="split poem-split">
+            <div class="panel">
+              <p class="h">唐诗 · 按体裁</p>
+              <p class="s">版式参考诗文目录：一组体裁，下面是标题和作者。</p>
+              <div class="poem-tabs">
+                <button type="button" class="is-on" data-form="all">全部</button>
+                <button type="button" data-form="wu">五言绝句</button>
+                <button type="button" data-form="qi">七言绝句</button>
+              </div>
+              <p class="form-head" data-poem-form="wu">五言绝句</p>
+              <button class="item" type="button" data-open-poem="jing" data-poem-form="wu">静夜思 · 李白 · 课内</button>
+              <button class="item" type="button" data-open-poem="chun" data-poem-form="wu">春晓 · 孟浩然 · 课内</button>
+              <p class="form-head" data-poem-form="qi">七言绝句</p>
+              <button class="item" type="button" data-open-poem="song" data-poem-form="qi">赠汪伦 · 李白 · 扩展</button>
+            </div>
+            <div class="panel poem-host" data-poem-id="jing"></div>
+          </div>
+        </div>
+                <div class="view" data-view="smath">
+          <div class="split">
+            <div class="panel" data-math-board="1">
+        <p class="h">数理工坊 · 口算</p>
+        <p class="s math-follow">二年级 · 退位减法 · 按知识点，不排名</p>
+        <div class="pills math-modes">
+          <button class="chip is-on" type="button" data-math-mode="oral">口算</button>
+          <button class="chip" type="button" data-math-mode="vert">竖式</button>
+          <button class="chip" type="button" data-math-mode="listen">听算</button>
+          <button class="chip" type="button" data-math-mode="cmp">比大小</button>
+          <button class="chip" type="button" data-math-mode="unit">厘米和米</button>
+        </div>
+        <p class="s math-progress">第 1 / 10 题 · 可停 · 不排名</p>
+        <div class="bar"><i class="math-bar" style="width:10%"></i></div>
+        <p class="q big-q math-q">32 − 17 = ?</p>
+        <div class="vert-box" hidden>
+          <div class="vert-a">32</div>
+          <div class="vert-b">− 17</div>
+          <div class="vert-line"></div>
+          <div class="vert-ans">?</div>
+        </div>
+        <p class="listen-mask" hidden>芽芽在读题。可以先答，也可以点「我听到了」再看题。</p>
+        <p class="math-digits">点数字作答</p>
+        <p class="hint math-hint">个位不够减，向十位借 1。</p>
+        <div class="pills math-why" hidden>
+          <button class="chip" type="button" data-why="slip">看错了</button>
+          <button class="chip" type="button" data-why="gap">还不会</button>
+          <button class="chip" type="button" data-why="fast">算太快</button>
+        </div>
+        <div class="choices math-cmp" hidden>
+          <button type="button" data-cmp="&gt;">大于</button>
+          <button type="button" data-cmp="&lt;">小于</button>
+          <button type="button" data-cmp="=">等于</button>
+        </div>
+        <button class="ghost math-heard" type="button" data-math-heard="1" hidden>我听到了</button>
+        <div class="pad math-pad">
+          <button type="button" data-math-key="1">1</button><button type="button" data-math-key="2">2</button><button type="button" data-math-key="3">3</button>
+          <button type="button" data-math-key="4">4</button><button type="button" data-math-key="5">5</button><button type="button" data-math-key="6">6</button>
+          <button type="button" data-math-key="7">7</button><button type="button" data-math-key="8">8</button><button type="button" data-math-key="9">9</button>
+          <button type="button" data-math-key="del">删</button><button type="button" data-math-key="0">0</button><button type="button" data-math-key="ok">✓</button>
+        </div>
+        <div class="pills">
+          <button class="chip" type="button" data-math-buddy="1">和芽芽比一比</button>
+          <button class="chip" type="button" data-math-photo="1">拍下我写的</button>
+          <button class="chip" type="button" data-math-stop="1">先停在这里</button>
+        </div>
+            </div>
+            <div class="panel">
+              <p class="s">小学知识点 · 不绑教材</p>
+              <button class="item is-pick" type="button" data-math-point="main" data-act="当前跟进：退位减法。">退位减法 · 当前</button>
+              <button class="item" type="button" data-math-point="fallback" data-act="先回去修 20 以内退位。今天这组换成更小的数。">20 以内 · 可回退</button>
+              <button class="item" type="button" data-math-point="later" data-act="表内乘法先不练。不会因此跳到后面的知识点。">表内乘法 · 已掌握</button>
+              <p class="s">和芽芽比，只比这一题。没有班级榜，也没有全国榜。</p>
+              <button class="ghost" type="button" data-math-finish="1">演示：这组做完</button>
+            </div>
+          </div>
+        </div>
+        <div class="view" data-view="mreport">
+          <p class="h">今天这组练完</p>
+          <p class="s math-report">还没做完。</p>
+          <div class="panel">没有名次，也不和别的小朋友比。明天还练这个点。</div>
+          <button class="cta" type="button" data-math-reset="1">再来一组</button>
+          <button class="ghost" type="button" data-view="shome">回今日探险</button>
+        </div>
+        <div class="view" data-view="slisten">
+          <div class="panel"><p class="h">厨房里的苹果</p><p class="s">磨耳朵 · 2 分 46 秒</p><div class="bar"><i style="width:48%"></i></div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<section class="qs-stage" data-end="parent-pc">
+  <div class="pc">
+    <div class="pc-top"><span>启芽星球 家长中心</span><span>当前孩子：豆豆</span></div>
+    <div class="pc-body">
+      <aside class="pc-side">
+        <button class="is-on" type="button" data-view="dhome">学习概览</button>
+        <button type="button" data-view="dai">AI 学情</button>
+        <button type="button" data-view="dwords">单词与闯关</button>
+        <button type="button" data-view="dmath">数学跟进</button>
+        <button type="button" data-view="dpoem">诗词记录</button>
+        <button type="button" data-view="dmember">家庭会员</button>
+        <button type="button" data-view="dset">计划设置</button>
+      </aside>
+      <main class="pc-main">
+        <div class="view is-on" data-view="dhome">
+          <p class="h">本周人话报告</p>
+          <div class="panel">豆豆这周英语新认识 18 个生活单词，闯过「我家」，正在点亮「好吃的」。cup、apple 已经比较熟。数学卡在退位减法——孩子自己选了 2 次「还不会」、4 次「看错了」。建议回退 20 以内再练 8 题。</div>
+          <button class="cta" type="button" data-view="dai" style="margin-top:12px">打开 AI 学情与图谱</button>
+          <div class="kpis" style="margin-top:12px">
+            <div class="kpi"><b>86 分钟</b><span class="tiny">学习时长</span></div>
+            <div class="kpi"><b>18</b><span class="tiny">新词</span></div>
+            <div class="kpi"><b>2 关</b><span class="tiny">英语通关</span></div>
+            <div class="kpi"><b>68%</b><span class="tiny">退位减法</span></div>
+          </div>
+        </div>
+        <div class="view" data-view="dai">
+          <p class="h">AI 学情</p>
+          <p class="s">图谱由作答数据计算，AI 只写成家长能懂的话。</p>
+          <div class="split">
+            <div class="panel">
+              <p class="s">数学知识图谱</p>
+              <div class="item">20 以内加减 · 已掌握</div>
+              <div class="item">20 以内退位 · 建议回退</div>
+              <div class="item" style="outline:2px solid #ff6b4a">退位减法 · 薄弱（近 7 天错 5 次）</div>
+              <div class="item">表内乘法 · 已掌握</div>
+              <p class="s" style="margin-top:10px">英语地图</p>
+              <div class="item">我家 · 已点亮</div>
+              <div class="item">好吃的 · 进行中 · fork 困难</div>
+              <div class="item">apple / cup · 较稳</div>
+            </div>
+            <div class="panel">
+              <p class="s">下一步（最多 3 条）</p>
+              <button class="item" type="button" data-act="已放进豆豆的继续今天：8 道 20 以内退位。学生端不出现价格。">1. 数学：8 道 20 以内退位 · 约 6 分钟</button>
+              <button class="item" type="button" data-act="已放进复习关：fork 和 cup。">2. 英语：复习关 fork / cup · 约 3 分钟</button>
+              <button class="item" type="button" data-act="彩蛋只推荐库里的《静夜思》，不会现编一首诗。">3. 彩蛋：拍过月亮，可听《静夜思》</button>
+              <p class="s">不建议：加难度到三位数减法。</p>
+            </div>
+          </div>
+        </div>
+        <div class="view" data-view="dwords">
+          <div class="toolbar"><input value="搜索单词"><button class="primary" type="button" data-act="已整理今日新词：apple、cup、plate。这是演示，不会下载文件。">导出今日新词</button></div>
+          <table>
+            <tr><th>单词</th><th>中文</th><th>来源</th><th>掌握</th><th>错次</th></tr>
+            <tr><td>apple</td><td>苹果</td><td>闯关</td><td><span class="tag green">学习中</span></td><td>0</td></tr>
+            <tr><td>cup</td><td>杯子</td><td>拍照</td><td><span class="tag green">学习中</span></td><td>1</td></tr>
+            <tr><td>fork</td><td>叉子</td><td>困难词</td><td><span class="tag orange">不稳定</span></td><td>2</td></tr>
+          </table>
+          <p class="s">孩子打开一首诗时，顺序是标题、朝代和作者、分行原文，再单开直译、注释、背景或赏析。</p>
+          <div class="poem-host" data-poem-id="jing"></div>
+
+        </div>
+        <div class="view" data-view="dmath">
+          <div class="split">
+            <div class="panel">
+              <p class="h">当前跟进点</p>
+              <div class="item">二年级 · 退位减法</div>
+              <p class="s">掌握度</p>
+              <div class="bar"><i style="width:68%"></i></div>
+              <p class="s">建议：先不要加难度；错 3 次同类题后回退「20 以内退位」。</p>
+            </div>
+            <div class="panel">
+              <p class="s">一键切换</p>
+              <button class="item is-pick" type="button" data-math-point="main" data-act="当前跟进：退位减法。">退位减法 · 当前</button>
+              <button class="item" type="button" data-math-point="fallback" data-act="已回退到 20 以内退位。明天的主路会用更小的数。">20 以内退位 · 回退</button>
+              <button class="item" type="button" data-math-point="later" data-act="表内乘法标记为已掌握，今天不加新题。">表内乘法 · 已掌握</button>
+            </div>
+          </div>
+          <div class="panel" style="margin-top:12px">
+            <p class="s math-preview-title">今日 10 题 · 退位减法 · 不绑教材</p>
+            <div class="math-preview"></div>
+            <button class="ghost" type="button" data-act="已整理今日 10 题打印草稿。这是演示，不会下载文件，页面上也不标价。">打印今日 10 题</button>
+            <p class="s">孩子端没有价格，这组也不锁。做完只看对了几道，不排名。</p>
+          </div>
+        </div>
+        <div class="view" data-view="dpoem">
+          <table>
+            <tr><th>诗</th><th>诗人</th><th>状态</th><th>最近朗读</th></tr>
+            <tr><td>静夜思</td><td>李白</td><td>已跟读</td><td>今天</td></tr>
+            <tr><td>春晓</td><td>孟浩然</td><td>未读</td><td>—</td></tr>
+          </table>
+        </div>
+        <div class="view" data-view="dmember">
+          <p class="h">家庭会员</p>
+          <p class="s">付钱的是家长。学生端没有这一页，也没有价格。</p>
+          <div class="split">
+            <div class="panel">
+              <p class="s">一直免费</p>
+              <div class="item">课标诗词、小学知识点</div>
+              <div class="item">基础英语世界：我家 / 好吃的 / 小动物</div>
+              <div class="item">闯关和基础磨耳朵</div>
+              <p class="s">今日额度</p>
+              <div class="item">拍照 2/3 · 还可拍 1 次</div>
+              <div class="item">口评 5/5 · 听和闯关不锁</div>
+            </div>
+            <div class="panel">
+              <p class="s">收费前仍可看 3 条建议。图谱不锁。</p>
+              <p>收费后，免费保留 1 条有证据的建议和 1 个薄弱点。会员才有 3 条、导出、历史和多孩子。</p>
+              <button class="cta" type="button" data-closed="1">月卡 · 暂未开放</button>
+              <button class="cta" type="button" data-closed="1" style="margin-top:8px">年卡 · 暂未开放</button>
+              <p class="s">道具直购，不展示代币，不自动续费。标价等 26.3 满足后再定。</p>
+            </div>
+          </div>
+        </div>
+        <div class="view" data-view="dset">
+          <div class="panel">
+            <button class="item" type="button" data-toggle="1">每日时长上限：25 分钟</button>
+            <button class="item" type="button" data-toggle="1">助记文字梗：开启（可关）</button>
+            <button class="item" type="button" data-toggle="1">拍照识词：允许</button>
+            <button class="item" type="button" data-toggle="1">年级交互档：小学 1-2 年级</button>
+            <button class="item" type="button" data-toggle="1">跨岛漂流瓶：开启，每天最多 1 个</button>
+            <button class="item" type="button" data-toggle="1">教材版本：未选择（不影响做题）</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<section class="qs-stage" data-end="admin">
+  <div class="pc admin">
+    <div class="pc-top"><span>SmartAdmin · 启芽星球内容中台</span><span>内容编辑 小王</span></div>
+    <div class="pc-body">
+      <aside class="admin-side">
+        <div class="logo">启芽星球</div>
+        <div class="group">运营</div>
+        <button class="is-on" type="button" data-view="adash">工作台</button>
+        <button type="button" data-view="akids">学生档案</button>
+        <button type="button" data-view="adata">学习数据看板</button>
+        <button type="button" data-view="amember">家庭会员</button>
+        <button type="button" data-view="areset">重置与付费</button>
+        <button type="button" data-view="agrowth">推广</button>
+        <div class="group">英语</div>
+        <button type="button" data-view="awords">词库管理</button>
+        <button type="button" data-view="alevels">闯关世界</button>
+        <button type="button" data-view="amne">助记审核</button>
+        <button type="button" data-view="alisten">磨耳朵专辑</button>
+        <div class="group">语文 / 数学</div>
+        <button type="button" data-view="apoems">诗词库</button>
+        <button type="button" data-view="apoets">诗人馆</button>
+        <button type="button" data-view="aknow">小学知识点</button>
+      </aside>
+      <main class="pc-main">
+        <div class="view is-on" data-view="adash">
+          <p class="h">运营工作台</p>
+          <p class="s">日常先看这里：今日是否健康、有没有内容事故。趋势到「学习数据」。</p>
+          <div class="kpis">
+            <div class="kpi"><b>1,284</b><span class="tiny">今日活跃学生</span></div>
+            <div class="kpi"><b>38%</b><span class="tiny">本周学满 4 天</span></div>
+            <div class="kpi"><b>12</b><span class="tiny">待审助记</span></div>
+            <div class="kpi"><b>3</b><span class="tiny">诗词纠错工单</span></div>
+          </div>
+          <div class="split" style="margin-top:12px">
+            <div class="panel"><p class="s">今日待办 / 学情异常</p>
+              <div class="item">抽查：豆豆 · 退位减法薄弱，建议已生成</div>
+              <div class="item">助记「fork 谐音」待审 · 儿童向过滤</div>
+              <div class="item">拍照词 lamp 入关成功率偏低</div>
+              <div class="item">退位减法通过率 41%，可能过难</div>
+              <div class="item">口评失败率升高，检查讯飞配额</div>
+              <button class="item" type="button" data-view="areset">额度重置后触顶 186 户 · 去重置与付费</button>
+            </div>
+            <div class="panel"><p class="s">内容库存</p>
+              <p>单词 420 · 关卡 28 · 小学知识点 46 · 诗词 40 · 可动诗人 4</p>
+              <p class="s">免费额度消耗：拍照 1.8 万次 / 口评 4.1 万次（本周）</p>
+            </div>
+          </div>
+        </div>
+        <div class="view" data-view="akids">
+          <div class="toolbar"><input value="搜索孩子/家长"><select><option>小学 2 年级</option></select></div>
+          <table>
+            <tr><th>标题</th><th>作者</th><th>体裁</th><th>学生页结构</th><th>原文</th></tr>
+            <tr><td>静夜思</td><td>李白</td><td>五言绝句</td><td>标题 / 朝代作者 / 分行 / 直译 / 注释 / 背景 / 赏析</td><td><span class="tag green">已锁</span></td></tr>
+            <tr><td>春晓</td><td>孟浩然</td><td>五言绝句</td><td>同上，一句对一句</td><td><span class="tag green">已锁</span></td></tr>
+            <tr><td>赠汪伦</td><td>李白</td><td>七言绝句</td><td>扩展，仍按同一页结构</td><td><span class="tag green">已锁</span></td></tr>
+          </table>
+          <p class="s">目录按体裁分组。注释按年级缩短。争议字只给学生一条适龄说法，其余留在这里，不进朗诵。</p>
+          <div class="poem-host" data-poem-id="jing"></div>
+
+        </div>
+        <div class="view" data-view="adata">
+          <p class="h">学习数据看板</p>
+          <p class="s">只读运营可进。北星是周学习天数 ≥ 4 的学生占比。</p>
+          <div class="kpis">
+            <div class="kpi"><b>38%</b><span class="tiny">周 4 天习惯占比</span></div>
+            <div class="kpi"><b>42%</b><span class="tiny">次日留存</span></div>
+            <div class="kpi"><b>21%</b><span class="tiny">7 日留存</span></div>
+            <div class="kpi"><b>56%</b><span class="tiny">家长周报打开率</span></div>
+          </div>
+          <div class="split" style="margin-top:12px">
+            <div class="panel">
+              <p class="s">英语漏斗</p>
+              <p>打开英语 100% </p><div class="bar"><i style="width:100%"></i></div>
+              <p>开始闯关 71% </p><div class="bar"><i style="width:71%"></i></div>
+              <p>通关 54% </p><div class="bar"><i style="width:54%"></i></div>
+              <p>到期复习回流 63% </p><div class="bar"><i style="width:63%"></i></div>
+              <p>拍照确认 88% · 入关 61%</p>
+            </div>
+            <div class="panel">
+              <p class="s">内容质量 / 异常</p>
+              <div class="item">退位减法通过率 41% <span class="tag orange">过难</span></div>
+              <div class="item">我家第 1 关通过率 96% <span class="tag">过易</span></div>
+              <div class="item">助记驳回率 9%</div>
+              <div class="item">口评失败（没听清）12%</div>
+              <div class="item">识别失败 Top：台灯、遥控器</div>
+            </div>
+          </div>
+        </div>
+        <div class="view" data-view="amember">
+          <p class="h">家庭会员</p>
+          <p class="s">运营在这里看订单和额度。学生端不可见，支付目前关闭。</p>
+          <div class="kpis">
+            <div class="kpi"><b>0</b><span class="tiny">开通家庭</span></div>
+            <div class="kpi"><b>关</b><span class="tiny">支付 · 26.3 未满足</span></div>
+            <div class="kpi"><b>1.8 万</b><span class="tiny">本周拍照次数</span></div>
+            <div class="kpi"><b>4.1 万</b><span class="tiny">本周口评次数</span></div>
+          </div>
+          <div class="panel" style="margin-top:12px">Android 等结算按 T+3，商户可退。iOS 约在自然月结束后 45 到 60 天到账，商户不能主动退，不能把 iOS 当月流水当成当月可提现。</div>
+          <table style="margin-top:12px">
+            <tr><th>时间</th><th>家庭</th><th>商品</th><th>通道</th><th>金额</th><th>状态</th></tr>
+            <tr><td>今天</td><td>豆豆</td><td>拍照 +3 次</td><td>运营赠送</td><td>0</td><td><span class="tag green">已赠送</span></td></tr>
+            <tr><td>—</td><td>—</td><td>月卡 / 年卡</td><td>未开通</td><td>—</td><td><span class="tag">暂未开放</span></td></tr>
+          </table>
+          <button class="ghost" type="button" data-view="areset" style="margin-top:12px">查看重置与付费场景</button>
+        </div>
+        <div class="view" data-view="areset">
+          <p class="h">重置与付费场景</p>
+          <p class="s">四种重置分开看。付费只发生在家长侧。支付未开放时，迁移通知不发送。学生端没有这一页。</p>
+          <div class="kpis">
+            <div class="kpi"><b>1,102</b><span class="tiny">今日额度已重置的家庭</span></div>
+            <div class="kpi"><b>186</b><span class="tiny">重置前已触顶</span></div>
+            <div class="kpi"><b>41</b><span class="tiny">触顶后打开会员页</span></div>
+            <div class="kpi"><b>0</b><span class="tiny">开通 · 支付关闭</span></div>
+          </div>
+          <div class="split" style="margin-top:12px">
+            <div class="panel">
+              <p class="s">粘性，不看金额</p>
+              <p>重置后次日还打开 61%</p><div class="bar"><i style="width:61%"></i></div>
+              <p>触顶后次日还在闯关 74%</p><div class="bar"><i style="width:74%"></i></div>
+              <p>周学习不少于 4 天 38%</p><div class="bar"><i style="width:38%"></i></div>
+            </div>
+            <div class="panel">
+              <p class="s">迁移名单：先有习惯，再反复触顶</p>
+              <div class="item">习惯已稳、还没触顶 · 210 户 · 不推会员</div>
+              <div class="item">习惯已稳、7 天触顶不少于 3 天 · 64 户 · 候选</div>
+              <div class="item">连续天数刚重置 · 96 户 · 只召回，不提付费</div>
+              <button class="cta" type="button" data-closed="1" style="margin-top:8px">迁移通知暂不发送</button>
+              <p class="s">26.3 未满足。召回可预览：明天会遇见 fork。不含价格。</p>
+            </div>
+          </div>
+          <table style="margin-top:12px">
+            <tr><th>重置类型</th><th>规则</th><th>今日</th><th>运营动作</th></tr>
+            <tr><td>额度日重置</td><td>北京时间 0 点恢复拍照和口评</td><td>1,102 户</td><td>只看触顶，学生端不提会员</td></tr>
+            <tr><td>连续天数重置</td><td>中断一天，连续天数归零</td><td>96 户</td><td><span class="tag red">不用于催付</span></td></tr>
+            <tr><td>会员周期重置</td><td>月卡或年卡到期</td><td>0</td><td>支付关闭，无到期户</td></tr>
+            <tr><td>进度重置</td><td>家长申请清空某一科</td><td>1 单待审</td><td>要审计，不能当商品</td></tr>
+          </table>
+          <table style="margin-top:12px">
+            <tr><th>场景</th><th>本周触达家长</th><th>打开会员页</th><th>开通</th><th>是否付费场景</th></tr>
+            <tr><td>拍照次数用尽</td><td>620</td><td>88</td><td>0</td><td><span class="tag green">是 · 家长侧</span></td></tr>
+            <tr><td>口评次数用尽</td><td>410</td><td>54</td><td>0</td><td><span class="tag green">是 · 家长侧</span></td></tr>
+            <tr><td>导出 / 历史 / 多孩子</td><td>36</td><td>21</td><td>0</td><td><span class="tag green">收费后才锁</span></td></tr>
+            <tr><td>闯关失败、诗词、知识点</td><td>—</td><td>—</td><td>—</td><td><span class="tag red">禁止</span></td></tr>
+          </table>
+        </div>
+        <div class="view" data-view="agrowth">
+          <p class="h">推广</p>
+          <p class="s">看的是家长从哪来、第二天还来不来。会员话术现在关闭。学生端没有广告位。</p>
+          <div class="kpis">
+            <div class="kpi"><b>86</b><span class="tiny">本周新增家庭</span></div>
+            <div class="kpi"><b>49%</b><span class="tiny">7 日还打开</span></div>
+            <div class="kpi"><b>38%</b><span class="tiny">周学习不少于 4 天</span></div>
+            <div class="kpi"><b>关</b><span class="tiny">会员话术 · 26.3 未满足</span></div>
+          </div>
+          <table style="margin-top:12px">
+            <tr><th>渠道</th><th>新增家庭</th><th>7 日还打开</th><th>周 4 天</th><th>动作</th></tr>
+            <tr><td>家长转发</td><td>34</td><td>62%</td><td>44%</td><td><span class="tag green">继续</span></td></tr>
+            <tr><td>微信搜一搜</td><td>21</td><td>48%</td><td>36%</td><td><span class="tag green">继续</span></td></tr>
+            <tr><td>视频号</td><td>18</td><td>41%</td><td>29%</td><td>先改素材，不追加</td></tr>
+            <tr><td>班级群</td><td>13</td><td>55%</td><td>46%</td><td>只保留老师自愿转发</td></tr>
+            <tr><td>朋友圈广告</td><td>0</td><td>—</td><td>—</td><td><span class="tag">收费前不做</span></td></tr>
+          </table>
+          <div class="panel" style="margin-top:12px">
+            <p class="s">待审分享句 · 不能带价格和排名</p>
+            <div class="item">拍一下家里的杯子，孩子就能听到 cup，还能闯一关。<span class="tag green">可通过</span></div>
+            <div class="item">李白这一次只读「举头望明月」。<span class="tag green">可通过</span></div>
+            <div class="item">别的孩子都开通了，再不买就落后。<span class="tag red">拒绝</span></div>
+          </div>
+          <button class="cta" type="button" data-closed="1" style="margin-top:12px">会员话术保持关闭</button>
+        </div>
+        <div class="view" data-view="awords">
+          <div class="toolbar"><input value="apple"><select><option>主题：食物</option></select><button class="primary" type="button" data-sheet="新增单词" data-sub="先入草稿，审核后才上架。">新增单词</button></div>
+          <table>
+            <tr><th>单词</th><th>释义</th><th>年级</th><th>主题</th><th>音频/图</th><th>状态</th></tr>
+            <tr><td>apple</td><td>苹果</td><td>1-2</td><td>食物</td><td>齐</td><td><span class="tag green">上架</span></td></tr>
+            <tr><td>cup</td><td>杯子</td><td>1-2</td><td>家庭</td><td>齐</td><td><span class="tag green">上架</span></td></tr>
+            <tr><td>fork</td><td>叉子</td><td>1-2</td><td>食物</td><td>缺助记</td><td><span class="tag orange">待补</span></td></tr>
+          </table>
+        </div>
+        <div class="view" data-view="alevels">
+          <div class="toolbar"><button class="primary" type="button" data-sheet="新增关卡包" data-sub="一个世界里的一关，8 到 12 个词。">新增关卡包</button></div>
+          <table>
+            <tr><th>世界</th><th>关卡</th><th>词数</th><th>类型</th><th>通过率</th></tr>
+            <tr><td>我家</td><td>1-6</td><td>48</td><td>新词+Boss</td><td>82%</td></tr>
+            <tr><td>好吃的</td><td>3</td><td>10</td><td>混合关</td><td>76%</td></tr>
+            <tr><td>好吃的</td><td>拍照专属</td><td>8</td><td>生活词</td><td>—</td></tr>
+          </table>
+        </div>
+        <div class="view" data-view="amne">
+          <div class="panel">
+            <p class="h">助记审核队列</p>
+            <div class="item"><b>fork</b> 草稿：叉子像一个人在吃饭。<span class="tag green">可通过</span></div>
+            <div class="item"><b>apple</b> AI 草稿含不当谐音。<span class="tag red">拒绝，回退图+例句</span></div>
+            <div class="item"><b>cup</b> 画面联想：小杯子口朝上接水。<span class="tag green">通过</span></div>
+          </div>
+        </div>
+        <div class="view" data-view="alisten">
+          <table>
+            <tr><th>专辑</th><th>分级</th><th>时长</th><th>状态</th></tr>
+            <tr><td>厨房里的苹果</td><td>L1</td><td>2:46</td><td><span class="tag green">上架</span></td></tr>
+            <tr><td>睡前小动物</td><td>L0</td><td>4:10</td><td><span class="tag green">上架</span></td></tr>
+          </table>
+        </div>
+        <div class="view" data-view="apoems">
+          <div class="toolbar"><button class="primary" type="button" data-sheet="新增诗词" data-sub="原文不能由模型改写。">新增诗词</button></div>
+          <table>
+            <tr><th>标题</th><th>作者</th><th>年级</th><th>原文锁定</th><th>音频</th></tr>
+            <tr><td>静夜思</td><td>李白</td><td>1-2</td><td><span class="tag green">已锁</span></td><td>齐</td></tr>
+            <tr><td>春晓</td><td>孟浩然</td><td>1-2</td><td><span class="tag green">已锁</span></td><td>齐</td></tr>
+          </table>
+        </div>
+        <div class="view" data-view="apoets">
+          <div class="grid2">
+            <div class="panel"><b>李白</b><p class="s">朗诵 / 讲解 / 待机 已齐</p></div>
+            <div class="panel"><b>杜甫</b><p class="s">朗诵 / 讲解 已齐</p></div>
+            <div class="panel"><b>王维</b><p class="s">待机制作中</p></div>
+            <div class="panel"><b>苏轼</b><p class="s">音频待对齐</p></div>
+          </div>
+        </div>
+        <div class="view" data-view="aknow">
+          <div class="toolbar"><select><option>二年级</option><option>一年级</option><option>三年级</option></select><button class="primary" type="button" data-sheet="新增知识点" data-sub="要写年级和前置点，不绑死教材章节。">新增知识点</button></div>
+          <table>
+            <tr><th>知识点</th><th>年级</th><th>前置点</th><th>模板</th><th>通过率</th></tr>
+            <tr><td>退位减法</td><td>2</td><td>20 以内退位</td><td>口算模板</td><td><span class="tag orange">41%</span></td></tr>
+            <tr><td>20 以内退位</td><td>1</td><td>20 以内加减</td><td>口算模板</td><td>79%</td></tr>
+            <tr><td>表内乘法</td><td>2</td><td>加法</td><td>口算模板</td><td>86%</td></tr>
+            <tr><td>分数加法</td><td>3</td><td>分数初步</td><td>填空+通分</td><td>—</td></tr>
+          </table>
+          <p class="s" style="margin-top:12px">今日组卷 · 题型跟着知识点，不跟着教材版本</p>
+          <table>
+            <tr><th>题型</th><th>知识点</th><th>今日组卷</th><th>规则</th></tr>
+            <tr><td>口算</td><td>退位减法</td><td>10 题</td><td>大字，可中途停</td></tr>
+            <tr><td>竖式</td><td>退位减法</td><td>同一组</td><td>只改排法</td></tr>
+            <tr><td>听算</td><td>退位减法</td><td>同一组</td><td>先藏题面</td></tr>
+            <tr><td>比大小</td><td>退位减法</td><td>用这组的两个数</td><td>不排名</td></tr>
+            <tr><td>厘米和米</td><td>长度</td><td>热身 3 题</td><td>不占今天这 10 题</td></tr>
+          </table>
+          <p class="s">人教、北师、苏教只作为家长搜索别名。这里不能按章节锁定出题，也不能把这组题锁到学生端付费。</p>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+</div>
+
+<script>
+(() => {
+  const root = document.getElementById('qiya-studio');
+  const alias = { battle:'map', settle:'map', book:'map', photo:'map', photocam:'map', photolook:'map', photopick:'map', photoblur:'map', photolimit:'map', photogate:'map', speaklimit:'map', listen:'home', points:'math', mine:'home', sbattle:'smap', spcam:'smap', splook:'smap', sppick:'smap', spblur:'smap', sphoto:'smap', pphoto:'phome', poem:'poet' };
+  function showEnd(name) {
+    root.querySelectorAll('.qs-stage').forEach((el) => el.classList.toggle('is-on', el.dataset.end === name));
+    root.querySelectorAll('.qs-bar button[data-end]').forEach((el) => el.classList.toggle('is-on', el.dataset.end === name));
+  }
+  function showView(stage, name) {
+    stage.querySelectorAll('.view[data-view]').forEach((el) => el.classList.toggle('is-on', el.dataset.view === name));
+    const nav = alias[name] || name;
+    const also = name === 'mreport' ? ['math', 'smath'] : [];
+    stage.querySelectorAll('.nav4 button[data-view], .nav5 button[data-view], .pc-side button[data-view], .admin-side button[data-view]').forEach((el) => {
+      el.classList.toggle('is-on', el.dataset.view === nav || also.indexOf(el.dataset.view) >= 0);
+    });
+  }
+  const PHOTO_WORDS = {
+    cup: { emoji: "☕", ipa: "/kʌp/", zh: "杯子", line: "I see a cup on the table." },
+    mug: { emoji: "🍵", ipa: "/mʌɡ/", zh: "茶杯", line: "I see a mug on the table." },
+    bowl: { emoji: "🥣", ipa: "/bəʊl/", zh: "碗", line: "I see a bowl on the table." }
+  };
+  let photoPick = "cup";
+  let photoTimer = 0;
+  function photoView(stage, name) {
+    const pc = stage && stage.dataset.end === "student-pc";
+    const map = { cam: pc ? "spcam" : "photocam", look: pc ? "splook" : "photolook", pick: pc ? "sppick" : "photopick", done: pc ? "sphoto" : "photo", blur: pc ? "spblur" : "photoblur" };
+    return map[name];
+  }
+  function paintPhoto() {
+    const w = PHOTO_WORDS[photoPick];
+    root.querySelectorAll(".photo-emoji, .pick-emoji").forEach((el) => { el.textContent = w.emoji; });
+    root.querySelectorAll(".photo-word, .pick-word").forEach((el) => { el.textContent = photoPick; });
+    root.querySelectorAll(".photo-line, .pick-line").forEach((el) => { el.innerHTML = w.ipa + "  " + w.zh + "<br>" + w.line; });
+    root.querySelectorAll("[data-cand]").forEach((el) => el.classList.toggle("is-on", el.dataset.cand === photoPick));
+  }
+  function commitPhoto() {
+    const w = PHOTO_WORDS[photoPick];
+    root.querySelectorAll(".live-word").forEach((el) => { el.textContent = photoPick; });
+    root.querySelectorAll(".live-zh").forEach((el) => { el.textContent = w.zh; });
+  }
+  function armPhotoLook(stage) {
+    clearTimeout(photoTimer);
+    photoTimer = setTimeout(() => {
+      const look = stage.querySelector(".view.is-on");
+      if (look && (look.dataset.view === "photolook" || look.dataset.view === "splook")) showView(stage, photoView(stage, "pick"));
+    }, 1400);
+  }
+  const toastBox = document.createElement('div');
+  toastBox.className = 'qs-toast';
+  toastBox.hidden = true;
+  root.appendChild(toastBox);
+  let toastTimer = 0;
+
+  const POEMS = {
+    jing: {
+      title: "静夜思", dynasty: "唐代", author: "李白", face: "李", form: "五言绝句", tag: "课内",
+      yi: "明亮的月光照在眼前，好像地上铺了一层霜。抬起头看见月亮，低下头想起家乡。",
+      bei: "李白这时不在家里。夜里看见月亮，就想起了远方的家乡。",
+      shang: "先看见月光，再抬头，再低头想家。动作很小，想念很大。",
+      ren: "李白，唐代诗人。小朋友可以先记住：他常常写月亮，也常常写出门在外。",
+      lines: [
+        { text: "床前明月光，", py: "chuáng qián míng yuè guāng", yi: "眼前这一片，洒满了月光。", shang: "先看见光，人还没有抬头。", notes: [["床", "先记成眼前这一片。好几种说法先不一起讲。"], ["明月", "夜里的月亮。"]] },
+        { text: "疑是地上霜。", py: "yí shì dì shàng shuāng", yi: "好像地上铺了一层霜。", shang: "月光很白，才让人看成霜。", notes: [["疑", "好像。"], ["霜", "白色的霜，不是真的结冰。"]] },
+        { text: "举头望明月，", py: "jǔ tóu wàng míng yuè", yi: "抬起头，看见天上的月亮。", shang: "到这里，人才抬起头。", notes: [["举头", "抬起头。"], ["望", "往远处看。"]] },
+        { text: "低头思故乡。", py: "dī tóu sī gù xiāng", yi: "低下头，想起了家乡。", shang: "头低下去，心里回到了家。", notes: [["低头", "低下头。"], ["故乡", "家乡。"]] }
+      ]
+    },
+    chun: {
+      title: "春晓", dynasty: "唐代", author: "孟浩然", face: "孟", form: "五言绝句", tag: "课内",
+      yi: "春天睡觉不知不觉天就亮了，到处都是鸟叫。想起夜里的风声雨声，不知道花落了多少。",
+      bei: "这是一首写春天早晨的短诗。人还没出门，先听见鸟，再想起夜里的风雨。",
+      shang: "人在被窝里，春天已经发生了。",
+      ren: "孟浩然，唐代诗人。小朋友可以先记住：他写的春天很安静。",
+      lines: [
+        { text: "春眠不觉晓，", py: "chūn mián bù jué xiǎo", yi: "春天睡觉，不知不觉天就亮了。", shang: "觉是睡醒。天已经亮了，人还在睡。", notes: [["眠", "睡觉。"], ["晓", "天亮。"]] },
+        { text: "处处闻啼鸟。", py: "chù chù wén tí niǎo", yi: "到处都能听见鸟叫。", shang: "还没睁眼，春天先从耳朵进来。", notes: [["处处", "到处。"], ["啼", "鸟叫。"]] },
+        { text: "夜来风雨声，", py: "yè lái fēng yǔ shēng", yi: "夜里听见过刮风下雨的声音。", shang: "这一句往回想，想到夜里。", notes: [["夜来", "夜里。"]] },
+        { text: "花落知多少。", py: "huā luò zhī duō shǎo", yi: "不知道花落了多少。", shang: "他没有去数，只是在想。", notes: [["知多少", "不知道有多少。"]] }
+      ]
+    },
+    song: {
+      title: "赠汪伦", dynasty: "唐代", author: "李白", face: "李", form: "七言绝句", tag: "扩展",
+      yi: "李白坐船正要离开，忽然听见岸上有人一边走一边唱歌。桃花潭的水就算有千尺深，也比不上汪伦送我的情意。",
+      bei: "汪伦来送李白。这首诗把很深的水和很深的情意放在一起。",
+      shang: "前面是离别的声音，后面才说出谁在送。",
+      ren: "还是李白。这一首写朋友来送他。",
+      lines: [
+        { text: "李白乘舟将欲行，", py: "lǐ bái chéng zhōu jiāng yù xíng", yi: "李白坐上小船，正要出发。", shang: "人已经在船上，还没走远。", notes: [["乘舟", "坐船。"], ["将欲行", "正要走。"]] },
+        { text: "忽闻岸上踏歌声。", py: "hū wén àn shàng tà gē shēng", yi: "忽然听见岸上有脚步，还有歌声。", shang: "先听见，还没看见是谁。", notes: [["忽闻", "忽然听见。"], ["踏歌", "一边走，一边唱。"]] },
+        { text: "桃花潭水深千尺，", py: "táo huā tán shuǐ shēn qiān chǐ", yi: "桃花潭的水，深得好像有千尺。", shang: "用水的深，好去比下一句的情意。", notes: [["潭", "比较深的水。"], ["千尺", "形容非常深，不是让人去量。"]] },
+        { text: "不及汪伦送我情。", py: "bù jí wāng lún sòng wǒ qíng", yi: "还是比不上汪伦送我的情意。", shang: "到这一句，才说出送行的人是汪伦。", notes: [["不及", "比不上。"], ["汪伦", "来送李白的朋友。"]] }
+      ]
+    }
+  };
+  function escPoem(s) {
+    return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  }
+  function renderPoem(host, id) {
+    const poem = POEMS[id] || POEMS.jing;
+    host.dataset.poemId = POEMS[id] ? id : "jing";
+    host.classList.remove("py-off");
+    let blocks = "";
+    for (let i = 0; i < poem.lines.length; i += 2) {
+      blocks += '<div class="couplet">' + verseButton(poem.lines[i], i) + (poem.lines[i + 1] ? verseButton(poem.lines[i + 1], i + 1) : "") + "</div>";
+    }
+    const line = poem.lines[0];
+    host.innerHTML = [
+      '<div class="scene slim"><div class="moon"></div><div class="poet">' + escPoem(poem.face) + "</div></div>",
+      '<h2 class="poem-title">' + escPoem(poem.title) + "</h2>",
+      '<p class="poem-source"><span>' + escPoem(poem.dynasty) + '</span>：<button type="button" data-author="' + escPoem(poem.ren) + '">' + escPoem(poem.author) + "</button></p>",
+      '<div class="row"><span class="tiny">' + escPoem(poem.form + " · " + poem.tag) + '</span><button type="button" class="ghost py-btn" data-py="1">注音开着</button></div>',
+      '<div class="verse-list">' + blocks + "</div>",
+      '<p class="hint poem-hint">点这一句，' + escPoem(poem.author) + "只读这一句</p>",
+      '<div class="poem-tabs">',
+      '<button type="button" class="is-on" data-layer="yi">直译</button>',
+      '<button type="button" data-layer="zhu">注释</button>',
+      '<button type="button" data-layer="bei">背景</button>',
+      '<button type="button" data-layer="shang">赏析</button>',
+      '<button type="button" data-layer="ren">诗人</button>',
+      "</div>",
+      '<div class="poem-sec" data-layer-panel="yi">' + escPoem(poem.yi) + "</div>",
+      '<div class="poem-sec" data-layer-panel="zhu" hidden><div class="note-row">' + notesHtml(line) + '</div><p class="note-pop s">点一个字，只看这一个字。</p></div>',
+      '<div class="poem-sec" data-layer-panel="bei" hidden>' + escPoem(poem.bei) + "</div>",
+      '<div class="poem-sec" data-layer-panel="shang" hidden>' + escPoem(line.shang) + "</div>",
+      '<div class="poem-sec" data-layer-panel="ren" hidden>' + escPoem(poem.ren) + "</div>",
+      '<div class="row"><button class="ghost" type="button" data-poem="read">请他读</button><button class="ghost" type="button" data-poem="talk">请他讲</button><button class="ghost" type="button" data-poem="together">一起读</button></div>'
+    ].join("");
+  }
+  function verseButton(line, i) {
+    return '<button type="button" class="verse' + (i === 0 ? " is-on" : "") + '" data-line="' + i + '" data-text="' + escPoem(line.text) + '" data-yi="' + escPoem(line.yi) + '" data-shang="' + escPoem(line.shang) + '"><span class="py">' + escPoem(line.py) + "</span><b>" + escPoem(line.text) + "</b></button>";
+  }
+  function notesHtml(line) {
+    return (line.notes || []).map((pair) => '<button type="button" data-note="' + escPoem(pair[1]) + '">' + escPoem(pair[0]) + "</button>").join("");
+  }
+  function poemOf(host) {
+    return POEMS[host.dataset.poemId] || POEMS.jing;
+  }
+  root.querySelectorAll(".poem-host").forEach((host) => renderPoem(host, host.dataset.poemId || "jing"));
+  function toast(msg) {
+    toastBox.hidden = false;
+    toastBox.textContent = msg;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { toastBox.hidden = true; }, 1700);
+  }
+  const sheet = document.createElement('div');
+  sheet.className = 'qs-sheet';
+  sheet.hidden = true;
+  sheet.innerHTML = '<div class="qs-dialog" role="dialog"><p class="h" id="qs-sheet-title">新建</p><p class="s" id="qs-sheet-sub"></p><input id="qs-sheet-input" placeholder="名称"><div class="row"><button type="button" class="ghost" data-sheet="cancel">取消</button><button type="button" class="cta" data-sheet="ok">保存草稿</button></div></div>';
+  root.appendChild(sheet);
+
+  const math = { mode: "oral", bank: "main", index: 0, correct: 0, streak: 0, gapStreak: 0, heard: false, repair: null, awaitingWhy: false, digits: "", unitIndex: 0 };
+  function subItem(a, b, kind, hint) {
+    return { a: a, b: b, text: a + " − " + b + " = ?", answer: String(a - b), kind: kind, hint: hint };
+  }
+  const MATH_SET = [[32,17],[41,16],[53,28],[70,26],[64,37],[85,49],[92,58],[76,18],[50,23],[81,45]].map((pair) => subItem(pair[0], pair[1], "退位减法", "个位不够减，向十位借 1。"));
+  const SMALL_SET = [[12,5],[13,6],[14,8],[15,7],[11,3],[16,9],[12,7],[13,5],[14,6],[15,8]].map((pair) => subItem(pair[0], pair[1], "20 以内退位", "个位不够减，向十位借 1。这是 20 以内。"));
+  const UNIT_SET = [
+    { text: "1 米 = ? 厘米", answer: "100", hint: "1 米是 100 厘米。二年级只练厘米和米。" },
+    { text: "100 厘米 = ? 米", answer: "1", hint: "100 厘米就是 1 米。" },
+    { text: "2 米 = ? 厘米", answer: "200", hint: "1 米是 100 厘米，2 米就是 200 厘米。" }
+  ];
+  function activeSet() { return math.bank === "small" ? SMALL_SET : MATH_SET; }
+  function currentItem() {
+    if (math.mode === "unit") return UNIT_SET[math.unitIndex % UNIT_SET.length];
+    if (math.repair) return math.repair;
+    const set = activeSet();
+    return set[Math.min(math.index, set.length - 1)];
+  }
+  function cmpShown(item) {
+    const flip = (math.index + (math.repair ? 1 : 0)) % 2 === 1;
+    return flip ? [item.b, item.a] : [item.a, item.b];
+  }
+  function expected(item) {
+    if (math.mode === "cmp" && item.a != null) {
+      const pair = cmpShown(item);
+      return pair[0] > pair[1] ? ">" : pair[0] < pair[1] ? "<" : "=";
+    }
+    return item.answer;
+  }
+  function faceText(item) {
+    if (math.mode === "cmp" && item.a != null) {
+      const pair = cmpShown(item);
+      return pair[0] + " \u25cb " + pair[1];
+    }
+    return item.text;
+  }
+  function fillPreview() {
+    const set = activeSet();
+    const title = math.bank === "small" ? "今日 10 题 · 20 以内退位 · 不绑教材" : "今日 10 题 · 退位减法 · 不绑教材";
+    root.querySelectorAll(".math-preview-title").forEach((el) => { el.textContent = title; });
+    const html = set.map((item, i) => {
+      const label = (i + 1) + ". " + item.a + " − " + item.b;
+      const act = "预览第 " + (i + 1) + " 题：" + item.a + " − " + item.b + "。学生做的时候会换数字。这里不标价。";
+      return '<button class="item" type="button" data-act="' + act + '"><b>' + label + "</b><span class=\"tiny\">" + item.kind + " · 口算</span></button>";
+    }).join("");
+    root.querySelectorAll(".math-preview").forEach((el) => { el.innerHTML = html; });
+  }
+  function renderMath() {
+    const item = currentItem();
+    const hideFace = math.mode === "listen" && !math.heard;
+    const showVert = math.mode === "vert" && !hideFace && item.a != null;
+    const showCmp = math.mode === "cmp";
+    const kind = math.bank === "small" ? "20 以内退位" : "退位减法";
+    const follow = math.bank === "small" ? "先回退：20 以内退位 · 按知识点，不排名" : "二年级 · 退位减法 · 按知识点，不排名";
+    let progress = "第 " + Math.min(math.index + 1, 10) + " / 10 题 · 可停 · 不排名";
+    if (math.mode === "unit") progress = "长度热身 · 不占今天这 10 题";
+    if (math.index >= 10 && math.mode !== "unit") progress = "10 / 10 做完了 · 不排名";
+    let hint = item.hint || "";
+    if (math.awaitingWhy) hint = "还没对。先选原因，下一题数字会变。" + hint;
+    if (math.gapStreak >= 2) hint += " 连续两次还不会，建议回退到 20 以内。可以先不回去。";
+    let digitText = math.digits || "点数字作答";
+    if (math.awaitingWhy) digitText = "先选原因";
+    else if (showCmp) digitText = "点大于、小于或等于";
+    else if (hideFace && !math.digits) digitText = "可以不看题，直接按";
+    const bar = math.mode === "unit" ? 100 : ((math.index >= 10 ? 10 : math.index + 1) / 10 * 100);
+    root.querySelectorAll("[data-math-mode]").forEach((btn) => btn.classList.toggle("is-on", btn.dataset.mathMode === math.mode));
+    root.querySelectorAll("[data-math-point]").forEach((el) => {
+      if (el.dataset.mathPoint === "later") return;
+      const on = (math.bank === "small" && el.dataset.mathPoint === "fallback") || (math.bank !== "small" && el.dataset.mathPoint === "main");
+      el.classList.toggle("is-pick", on);
+    });
+    root.querySelectorAll("[data-math-board]").forEach((board) => {
+      const followEl = board.querySelector(".math-follow");
+      if (followEl) followEl.textContent = follow;
+      const prog = board.querySelector(".math-progress");
+      if (prog) prog.textContent = progress;
+      const barEl = board.querySelector(".math-bar");
+      if (barEl) barEl.style.width = bar + "%";
+      const q = board.querySelector(".math-q");
+      if (q) {
+        q.textContent = faceText(item);
+        q.hidden = hideFace || showVert;
+      }
+      const vert = board.querySelector(".vert-box");
+      if (vert) {
+        vert.hidden = !showVert;
+        const va = board.querySelector(".vert-a");
+        const vb = board.querySelector(".vert-b");
+        const vans = board.querySelector(".vert-ans");
+        if (va) va.textContent = item.a != null ? String(item.a) : "";
+        if (vb) vb.textContent = item.b != null ? "− " + item.b : "";
+        if (vans) vans.textContent = math.digits || "?";
+      }
+      const mask = board.querySelector(".listen-mask");
+      if (mask) mask.hidden = !hideFace;
+      const heard = board.querySelector(".math-heard");
+      if (heard) heard.hidden = math.mode !== "listen" || math.heard;
+      const why = board.querySelector(".math-why");
+      if (why) why.hidden = !math.awaitingWhy;
+      const cmp = board.querySelector(".math-cmp");
+      if (cmp) cmp.hidden = !showCmp;
+      const pad = board.querySelector(".math-pad");
+      if (pad) pad.hidden = showCmp;
+      const digits = board.querySelector(".math-digits");
+      if (digits) digits.textContent = digitText;
+      const hintEl = board.querySelector(".math-hint");
+      if (hintEl) hintEl.textContent = hint;
+    });
+    fillPreview();
+  }
+  function reportText() {
+    const kind = math.bank === "small" ? "20 以内退位" : "退位减法";
+    if (math.index <= 0) return "这组还没做完，现在是 0 / 10。可以先停。明天还练" + kind + "。没有名次。";
+    const unstable = math.gapStreak > 0 || math.correct < math.index;
+    return "做了 " + math.index + " / 10 题，第一次就对了 " + math.correct + " 道。" + (unstable ? kind + "还不太稳。" : kind + "更稳了一点。") + "明天还练这个点。没有名次。";
+  }
+  function openReport(stage) {
+    const say = reportText();
+    root.querySelectorAll(".math-report").forEach((el) => { el.textContent = say; });
+    if (stage) showView(stage, "mreport");
+  }
+  function submitMath(guess, stage) {
+    if (math.mode !== "unit" && !math.repair && math.index >= activeSet().length) {
+      openReport(stage);
+      return;
+    }
+    const item = currentItem();
+    if (String(guess) !== String(expected(item))) {
+      math.awaitingWhy = true;
+      math.streak = 0;
+      math.digits = "";
+      renderMath();
+      toast("还没对。先选看错了、还不会或算太快，再做一道新题。");
+      return;
+    }
+    math.awaitingWhy = false;
+    math.digits = "";
+    math.heard = false;
+    if (math.mode === "unit") {
+      math.unitIndex += 1;
+      if (math.unitIndex >= UNIT_SET.length) {
+        math.unitIndex = 0;
+        math.mode = "oral";
+        toast("长度热身做完了。回到今天这 10 题。");
+      } else toast("做对了。再换一个长度。");
+      renderMath();
+      return;
+    }
+    const repaired = !!math.repair;
+    math.repair = null;
+    if (repaired) math.streak = 0;
+    else {
+      math.correct += 1;
+      math.streak += 1;
+    }
+    math.index += 1;
+    if (!repaired && math.streak && math.streak % 3 === 0) toast("连续做对 3 道。这个点更稳了一点。");
+    else toast(repaired ? "补题做对了。回到今天这组。" : "做对了。");
+    if (math.index >= activeSet().length) {
+      renderMath();
+      openReport(stage);
+      return;
+    }
+    renderMath();
+  }
+  function applyWhy(kind) {
+    math.awaitingWhy = false;
+    math.digits = "";
+    math.heard = false;
+    if (math.mode === "unit") {
+      math.unitIndex = (math.unitIndex + 1) % UNIT_SET.length;
+      toast("这道先记住：1 米 = 100 厘米。再做一道长度。");
+      renderMath();
+      return;
+    }
+    const pools = {
+      gap: math.bank === "small" ? [[11,2],[12,3],[13,4],[14,5]] : [[12,5],[13,6],[14,8],[15,7],[11,4]],
+      fast: math.bank === "small" ? [[15,7],[14,6],[13,5],[16,9]] : [[46,19],[63,27],[54,18],[72,35]],
+      slip: math.bank === "small" ? [[12,4],[13,7],[11,5],[14,8]] : [[53,28],[64,37],[85,49],[91,46]]
+    };
+    if (kind === "gap") math.gapStreak += 1;
+    else math.gapStreak = 0;
+    const pool = pools[kind] || pools.slip;
+    const pair = pool[(math.index + math.gapStreak) % pool.length];
+    const hints = {
+      gap: "还不会：先降一档，做一道更小的退位题。",
+      fast: "算太快：同难度再来一道，不背原来的答案。",
+      slip: "看错了：数字换掉，知识点还是这一类减法。"
+    };
+    math.repair = subItem(pair[0], pair[1], math.bank === "small" ? "20 以内退位" : "退位减法", hints[kind] || hints.slip);
+    const extra = math.gapStreak >= 2 ? "连续两次还不会。建议先回退到 20 以内。可以先不回去。" : "";
+    toast((hints[kind] || hints.slip) + extra);
+    renderMath();
+  }
+  function resetMath() {
+    math.mode = "oral";
+    math.index = 0;
+    math.correct = 0;
+    math.streak = 0;
+    math.gapStreak = 0;
+    math.heard = false;
+    math.repair = null;
+    math.awaitingWhy = false;
+    math.digits = "";
+    math.unitIndex = 0;
+    renderMath();
+  }
+  function handleMathClick(e) {
+    const modeBtn = e.target.closest("[data-math-mode]");
+    if (modeBtn) {
+      math.mode = modeBtn.dataset.mathMode;
+      math.heard = false;
+      math.digits = "";
+      const says = {
+        oral: "口算：一屏一题，大字。",
+        vert: "竖式：同一道题，换成竖着写。",
+        listen: "听算：先藏题。可以点我听到了，也可以直接答。",
+        cmp: "比大小：比这一题里的两个数。没有排名。",
+        unit: "厘米和米：不占今天这 10 题。"
+      };
+      renderMath();
+      toast(says[math.mode] || "已切换练法");
+      return true;
+    }
+    const point = e.target.closest("[data-math-point]");
+    if (point) {
+      const kind = point.dataset.mathPoint;
+      if (kind !== "later") {
+        math.bank = kind === "fallback" ? "small" : "main";
+        math.mode = "oral";
+        math.index = 0;
+        math.correct = 0;
+        math.streak = 0;
+        math.gapStreak = 0;
+        math.repair = null;
+        math.awaitingWhy = false;
+        math.digits = "";
+        math.heard = false;
+        renderMath();
+      }
+      const stage = point.closest(".qs-stage");
+      if (point.dataset.view && stage) showView(stage, point.dataset.view);
+      toast(point.dataset.act || (math.bank === "small" ? "先回去修 20 以内退位。" : "当前跟进：退位减法。"));
+      return true;
+    }
+    const heard = e.target.closest("[data-math-heard]");
+    if (heard) {
+      math.heard = true;
+      renderMath();
+      toast("题面出来了。也可以不看，直接按听到的答。");
+      return true;
+    }
+    const cmp = e.target.closest("[data-cmp]");
+    if (cmp && cmp.closest("[data-math-board]")) {
+      submitMath(cmp.dataset.cmp, cmp.closest(".qs-stage"));
+      return true;
+    }
+    const why = e.target.closest("[data-why]");
+    if (why && why.closest("[data-math-board]")) {
+      applyWhy(why.dataset.why);
+      return true;
+    }
+    const buddy = e.target.closest("[data-math-buddy]");
+    if (buddy) {
+      const ans = expected(currentItem());
+      const wrong = math.mode === "cmp" ? (ans === ">" ? "<" : ">") : String(Math.max(0, Number(ans) - 1));
+      toast("芽芽把这题写成了 " + wrong + "。没有名次。你做对就算比过芽芽。");
+      return true;
+    }
+    const photo = e.target.closest("[data-math-photo]");
+    if (photo) {
+      const ans = String(expected(currentItem()));
+      if (math.digits && math.digits === ans) {
+        submitMath(math.digits, photo.closest(".qs-stage"));
+        toast("拍到的和这题一样。只检查这张纸，不去搜题。");
+        return true;
+      }
+      const written = math.mode === "cmp" ? (ans === ">" ? "<" : ">") : String(Math.max(0, Number(ans) - 1));
+      math.awaitingWhy = true;
+      math.digits = "";
+      renderMath();
+      toast("拍到你写的是 " + written + "。只检查这张纸，不去搜题。先选原因。");
+      return true;
+    }
+    const stop = e.target.closest("[data-math-stop]");
+    if (stop) {
+      openReport(stop.closest(".qs-stage"));
+      return true;
+    }
+    const reset = e.target.closest("[data-math-reset]");
+    if (reset) {
+      resetMath();
+      const stage = reset.closest(".qs-stage");
+      if (stage) showView(stage, stage.dataset.end === "student-pc" ? "smath" : "math");
+      toast("再来一组。还是这个知识点。");
+      return true;
+    }
+    const finish = e.target.closest("[data-math-finish]");
+    if (finish) {
+      math.index = activeSet().length;
+      math.correct = 8;
+      math.gapStreak = 1;
+      math.repair = null;
+      math.awaitingWhy = false;
+      math.mode = "oral";
+      renderMath();
+      openReport(finish.closest(".qs-stage"));
+      return true;
+    }
+    const keyBtn = e.target.closest("[data-math-key]");
+    if (keyBtn) {
+      const key = keyBtn.dataset.mathKey;
+      if (math.mode === "cmp") return true;
+      if (math.awaitingWhy) {
+        toast("先选看错了、还不会或算太快。");
+        return true;
+      }
+      if (key === "ok") submitMath(math.digits, keyBtn.closest(".qs-stage"));
+      else if (key === "del") {
+        math.digits = math.digits.slice(0, -1);
+        renderMath();
+      } else if (/^\d$/.test(key)) {
+        math.digits = (math.digits + key).slice(-3);
+        renderMath();
+      }
+      return true;
+    }
+    return false;
+  }
+  function answerOf(text) {
+    const m = String(text).replace(/\s/g, '').match(/(\d+)[−\-](\d+)/);
+    return m ? String(Number(m[1]) - Number(m[2])) : '';
+  }
+  root.addEventListener('input', (e) => {
+    const input = e.target.closest('input');
+    if (!input || input.id === 'qs-sheet-input') return;
+    const table = input.closest('.view') && input.closest('.view').querySelector('table');
+    if (!table) return;
+    const q = input.value.trim().toLowerCase();
+    table.querySelectorAll('tr').forEach((tr) => {
+      if (tr.querySelector('th')) return;
+      tr.hidden = !!q && !tr.textContent.toLowerCase().includes(q);
+    });
+  });
+  root.addEventListener('change', (e) => {
+    const sel = e.target.closest('select');
+    if (!sel) return;
+    const table = sel.closest('.view') && sel.closest('.view').querySelector('table');
+    if (!table) { toast('已切换：' + sel.value); return; }
+    const q = sel.value.replace('年级', '').trim();
+    table.querySelectorAll('tr').forEach((tr) => {
+      if (tr.querySelector('th')) return;
+      tr.hidden = q && !tr.textContent.includes(q) && !tr.textContent.includes(sel.value);
+    });
+    toast('已按「' + sel.value + '」筛选');
+  });
+  root.addEventListener('click', (e) => {
+    if (e.target === sheet) { sheet.hidden = true; return; }
+    if (handleMathClick(e)) return;
+
+    const opened = e.target.closest("[data-open-poem]");
+    if (opened) {
+      const stage = opened.closest(".qs-stage");
+      const explicit = opened.dataset.view;
+      if (explicit && stage) showView(stage, explicit);
+      const host = (explicit && stage && stage.querySelector('.view[data-view="' + explicit + '"] .poem-host'))
+        || (opened.closest(".view") && opened.closest(".view").querySelector(".poem-host"));
+      if (host) renderPoem(host, opened.dataset.openPoem);
+      return;
+    }
+    const formBtn = e.target.closest("[data-form]");
+    if (formBtn && formBtn.closest(".poem-tabs")) {
+      const scope = formBtn.closest(".view");
+      formBtn.parentElement.querySelectorAll("button").forEach((el) => el.classList.toggle("is-on", el === formBtn));
+      const name = formBtn.dataset.form;
+      scope.querySelectorAll("[data-poem-form]").forEach((el) => {
+        el.hidden = name !== "all" && el.dataset.poemForm !== name;
+      });
+      return;
+    }
+    const layerBtn = e.target.closest("[data-layer]");
+    if (layerBtn) {
+      const host = layerBtn.closest(".poem-host");
+      host.querySelectorAll("[data-layer]").forEach((el) => el.classList.toggle("is-on", el === layerBtn));
+      host.querySelectorAll("[data-layer-panel]").forEach((el) => { el.hidden = el.dataset.layerPanel !== layerBtn.dataset.layer; });
+      return;
+    }
+    const verse = e.target.closest("[data-line]");
+    if (verse) {
+      const host = verse.closest(".poem-host");
+      host.querySelectorAll("[data-line]").forEach((el) => el.classList.toggle("is-on", el === verse));
+      const poem = poemOf(host);
+      const hint = host.querySelector(".poem-hint");
+      if (hint) hint.textContent = "只讲这一句：" + (verse.dataset.yi || "");
+      const shang = host.querySelector('[data-layer-panel="shang"]');
+      if (shang) shang.textContent = verse.dataset.shang || "";
+      const row = host.querySelector(".note-row");
+      if (row) row.innerHTML = notesHtml(poem.lines[Number(verse.dataset.line)] || poem.lines[0]);
+      const pop = host.querySelector(".note-pop");
+      if (pop) pop.textContent = "点一个字，只看这一个字。";
+      const actor = host.querySelector(".poet");
+      if (actor) { actor.classList.add("is-talk"); setTimeout(() => actor.classList.remove("is-talk"), 650); }
+      return;
+    }
+    const noteBtn = e.target.closest("[data-note]");
+    if (noteBtn) {
+      const host = noteBtn.closest(".poem-host");
+      host.querySelectorAll("[data-note]").forEach((el) => el.classList.toggle("is-on", el === noteBtn));
+      const pop = host.querySelector(".note-pop");
+      if (pop) pop.textContent = noteBtn.textContent.trim() + "：" + noteBtn.dataset.note;
+      return;
+    }
+    const pyBtn = e.target.closest("[data-py]");
+    if (pyBtn) {
+      const host = pyBtn.closest(".poem-host");
+      const off = host.classList.toggle("py-off");
+      pyBtn.textContent = off ? "注音藏了" : "注音开着";
+      toast(off ? "注音先藏起来" : "注音打开了");
+      return;
+    }
+    const authorBtn = e.target.closest("[data-author]");
+    if (authorBtn) {
+      const host = authorBtn.closest(".poem-host");
+      host.querySelectorAll("[data-layer]").forEach((el) => el.classList.toggle("is-on", el.dataset.layer === "ren"));
+      host.querySelectorAll("[data-layer-panel]").forEach((el) => { el.hidden = el.dataset.layerPanel !== "ren"; });
+      toast(authorBtn.textContent.trim() + "的介绍打开了");
+      return;
+    }
+    const sheetBtn = e.target.closest('[data-sheet]');
+    if (sheetBtn) {
+      if (sheetBtn.dataset.sheet === 'ok') {
+        const name = sheet.querySelector('#qs-sheet-input').value.trim() || '未命名';
+        toast('已保存草稿「' + name + '」。上架前还要审核。');
+      } else if (!sheetBtn.dataset.sub) {
+        sheet.hidden = true;
+        return;
+      }
+      if (sheetBtn.dataset.sub) {
+        sheet.hidden = false;
+        sheet.querySelector('#qs-sheet-title').textContent = sheetBtn.dataset.sheet;
+        sheet.querySelector('#qs-sheet-sub').textContent = sheetBtn.dataset.sub;
+        sheet.querySelector('#qs-sheet-input').value = '';
+        return;
+      }
+      sheet.hidden = true;
+      return;
+    }
+    const photoBtn = e.target.closest("[data-photo]");
+    if (photoBtn) {
+      const stage = photoBtn.closest(".qs-stage");
+      const act = photoBtn.dataset.photo;
+      clearTimeout(photoTimer);
+      if (act === "shoot" || act === "album") {
+        photoPick = "cup";
+        paintPhoto();
+        toast(act === "album" ? "从相册选了一张。只认一件东西，不认人脸。" : "拍好了。芽芽开始看。");
+        showView(stage, photoView(stage, "look"));
+        armPhotoLook(stage);
+        return;
+      }
+      if (act === "flash") {
+        const on = photoBtn.classList.toggle("is-pick");
+        photoBtn.textContent = on ? "手电开" : "手电";
+        toast(on ? "手电开了。暗的时候再拍。" : "手电关了。");
+        return;
+      }
+      if (act === "ready") { showView(stage, photoView(stage, "pick")); return; }
+      if (act === "cancel") { showView(stage, photoView(stage, "cam")); toast("已取消。这次不占拍照次数。"); return; }
+      if (act === "keep") {
+        paintPhoto();
+        commitPhoto();
+        toast("收下 " + photoPick + "。放进好吃的和单词本，不新开世界。");
+        showView(stage, photoView(stage, "done"));
+        return;
+      }
+      if (act === "blur") { showView(stage, photoView(stage, "blur")); toast("没看清。不展示猜测，这次不占次数。"); return; }
+    }
+    const cand = e.target.closest("[data-cand]");
+    if (cand && PHOTO_WORDS[cand.dataset.cand]) {
+      photoPick = cand.dataset.cand;
+      paintPhoto();
+      toast("换成" + PHOTO_WORDS[photoPick].zh + "。不用重新拍照。");
+      return;
+    }
+    const endBtn = e.target.closest('[data-end]');
+    if (endBtn && endBtn.closest('.qs-bar')) { showEnd(endBtn.dataset.end); return; }
+    const viewBtn = e.target.closest('[data-view]');
+    if (viewBtn && !viewBtn.classList.contains('view')) {
+      const stage = viewBtn.closest('.qs-stage');
+      if (stage) showView(stage, viewBtn.dataset.view);
+      return;
+    }
+    const gate = e.target.closest('[data-gate]');
+    if (gate) {
+      const box = document.getElementById('gate-result');
+      if (box) {
+        box.hidden = false;
+        box.textContent = gate.dataset.gate === '1'
+          ? '拍照和跟读今天的次数用完了，闯关和听还可以继续。'
+          : '再请爸爸妈妈看一下，先不要把手机交给小朋友。';
+      }
+      return;
+    }
+    const tab = e.target.closest('[data-tab]');
+    if (tab) {
+      const stage = tab.closest('.qs-stage');
+      stage.querySelectorAll('[data-panel]').forEach((el) => { el.hidden = el.dataset.panel !== tab.dataset.tab; });
+      return;
+    }
+    const why = e.target.closest('[data-why]');
+    if (why) {
+      const q = document.getElementById('math-q');
+      const hint = document.getElementById('math-hint');
+      if (!q || !hint) return;
+      const whyView = why.closest('.view');
+      if (whyView) whyView.dataset.digits = '';
+      if (why.dataset.why === 'gap') {
+        q.textContent = '12 − 5 = ?';
+        hint.textContent = '还不会：先降一档，做一道更小的退位题';
+      } else if (why.dataset.why === 'fast') {
+        q.textContent = '41 − 16 = ?';
+        hint.textContent = '算太快：同难度再来一道，不背原来的答案';
+      } else {
+        q.textContent = '53 − 28 = ?';
+        hint.textContent = '看错了：数字换掉，知识点还是退位减法';
+      }
+      return;
+    }
+    const poem = e.target.closest('#poem-line');
+    if (poem) {
+      const lines = ['床前明月光', '疑是地上霜', '举头望明月', '低头思故乡'];
+      const notes = ['只讲这一句：床前洒着这一地月光', '只讲这一句：好像地上结了一层霜', '只讲这一句：抬头看见天上的明月', '只讲这一句：低下头，想起了家乡'];
+      const cur = poem.textContent.trim();
+      const i = (Math.max(lines.indexOf(cur), 0) + (lines.includes(cur) ? 1 : 0)) % lines.length;
+      poem.textContent = lines[i];
+      const ph = document.getElementById('poem-hint');
+      if (ph) ph.textContent = notes[i];
+      return;
+    }
+    const choice = e.target.closest('#kid-choices button, #pc-choices button');
+    if (choice) {
+      const group = choice.parentElement;
+      group.querySelectorAll('button').forEach((el) => el.classList.remove('right', 'wrong'));
+      choice.classList.add(choice.dataset.ok ? 'right' : 'wrong');
+      const hint = document.getElementById('kid-hint');
+      if (hint) {
+        hint.hidden = false;
+        hint.textContent = choice.dataset.ok
+          ? '记忆贝壳：apple 是红苹果砸在桌上，叮！'
+          : '先放进修理袋。这一关结束前，还会用听音再练一次。';
+      }
+      if (choice.dataset.ok) {
+        const stage = choice.closest('.qs-stage');
+        setTimeout(() => showView(stage, stage.dataset.end === 'student-app' ? 'settle' : 'sbook'), 450);
+      }
+      return;
+    }
+    const poemAct = e.target.closest('[data-poem]');
+    if (poemAct) {
+      const host = poemAct.closest('.poem-host') || root;
+      const line = host.querySelector('[data-line].is-on') || host.querySelector('[data-line]');
+      const text = line ? line.dataset.text : '这一句';
+      const author = (host.querySelector('.poem-source button') || {}).textContent || '诗人';
+      const actor = host.querySelector('.poet');
+      if (actor) { actor.classList.add('is-talk'); setTimeout(() => actor.classList.remove('is-talk'), 700); }
+      const say = poemAct.dataset.poem === 'talk'
+        ? '只讲这一句：' + (line ? line.dataset.yi : text)
+        : poemAct.dataset.poem === 'together'
+          ? '一起读「' + text.trim() + '」。低龄不打分。'
+          : author.trim() + '正在读「' + text.trim() + '」。';
+      const hint = host.querySelector('.poem-hint');
+      if (hint) hint.textContent = say;
+      toast(say);
+      return;
+    }
+    const closed = e.target.closest('[data-closed]');
+    if (closed) {
+      toast('先不能支付。孩子端看不到价格，闯关和听还可以继续。');
+      return;
+    }
+    const act = e.target.closest('[data-act]');
+    if (act) {
+      act.classList.add('is-play');
+      setTimeout(() => act.classList.remove('is-play'), 700);
+      toast(act.dataset.act);
+      return;
+    }
+    const toggled = e.target.closest('[data-toggle]');
+    if (toggled) {
+      const on = toggled.classList.toggle('is-pick');
+      toast(on ? '已为豆豆打开这项' : '已为豆豆关闭这项');
+      return;
+    }
+    const padBtn = e.target.closest('.pad button');
+    if (padBtn) {
+      const view = padBtn.closest('.view');
+      const qEl = view.querySelector('#math-q') || view.querySelector('.h') || view.querySelector('.q');
+      const label = padBtn.textContent.trim();
+      if (!view.dataset.digits) view.dataset.digits = '';
+      if (label === '✓' || padBtn.classList.contains('ok')) {
+        const guess = padBtn.classList.contains('ok') ? label : view.dataset.digits;
+        const ans = answerOf(qEl ? qEl.textContent : '');
+        toast(ans && guess === ans ? '做对了。这个点更稳了一点。' : '还没对。先选看错了、还不会或算太快，再做一道新题。');
+        view.dataset.digits = '';
+        return;
+      }
+      if (/^\d$/.test(label)) {
+        view.dataset.digits = (view.dataset.digits + label).slice(-2);
+        toast('你的答案：' + view.dataset.digits);
+      }
+      return;
+    }
+    const row = e.target.closest('tbody tr, table tr');
+    if (row && !row.querySelector('th') && !e.target.closest('button')) {
+      const name = row.children[0] ? row.children[0].textContent.trim() : '这条';
+      toast('打开「' + name + '」的详情。演示数据，不会改真实库。');
+      return;
+    }
+    const btn = e.target.closest('button');
+    if (btn && !btn.disabled) toast(btn.textContent.trim().slice(0, 28) || '已点到');
+  });
+  renderMath();
+})();
+</script>
+</body>
+</html>

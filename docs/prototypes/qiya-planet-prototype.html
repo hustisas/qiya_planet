@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>启芽星球 产品原型</title>
+  <style>
+    body { margin: 0; font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #eef3f8; color: #16324f; }
+    .doc-bar { max-width: 960px; margin: 0 auto; padding: 20px 16px 8px; }
+    .doc-bar h1 { margin: 0 0 8px; font-size: 22px; font-weight: 500; }
+    .doc-bar p { margin: 0 0 12px; font-size: 14px; line-height: 1.6; }
+    .viz-carousel > section[hidden] { display: none; }
+    .viz-switch { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 12px; }
+    .viz-switch button { border: 0; border-radius: 999px; padding: 8px 14px; background: #fff; color: #16324f; }
+    .viz-switch button.is-on { background: #16324f; color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="doc-bar">
+    <h1>启芽星球 · 可点击产品原型</h1>
+    <p>用于评审沟通。点击手机里的按钮、底部导航、选项即可换页。数学按小学知识点灵活跟进，不绑教材章节。</p>
+    <div class="viz-switch" id="qiya-switch">
+      <button type="button" class="is-on" data-variant="小学探险">小学探险</button>
+      <button type="button" data-variant="初中学板">初中学板</button>
+      <button type="button" data-variant="主路径故事板">主路径故事板</button>
+    </div>
+  </div>
+  <div id="qiya-planet-proto" class="viz-carousel" aria-label="启芽星球产品原型" data-previous-label="上一版" data-next-label="下一版">
+  <section data-variant="小学探险" aria-label="小学探险版小程序原型" class="viz-dotted-background">
+    <div class="qiya-stage">
+      <div class="qiya-phone qiya-kid" id="qiya-kid" data-age="kid">
+        <div class="qiya-bezel">
+          <div class="qiya-statusbar">
+            <span>9:41</span>
+            <span class="qiya-capsule">启芽星球</span>
+            <span class="qiya-signal">●●●</span>
+          </div>
+          <div class="qiya-screens" data-screens>
+            <div class="qiya-screen is-on" data-screen="home">
+              <header class="qiya-top">
+                <div>
+                  <p class="qiya-hi">下午好，豆豆</p>
+                  <p class="qiya-sub">今天把厨房灯塔再点亮一点</p>
+                </div>
+                <button class="qiya-avatar" type="button" data-go="parent" aria-label="家长中心">🌱</button>
+              </header>
+              <div class="qiya-hero">
+                <div class="qiya-planet" aria-hidden="true"></div>
+                <div class="qiya-streak">连续探险 5 天</div>
+              </div>
+              <div class="qiya-tasks">
+                <button type="button" data-go="listen"><span>听一听</span><b>磨耳朵 1 段</b></button>
+                <button type="button" data-go="map"><span>闯一闯</span><b>厨房世界 第 3 关</b></button>
+                <button type="button" data-go="poet"><span>读一读</span><b>《静夜思》</b></button>
+                <button type="button" data-go="math"><span>练一练</span><b>跟进：退位减法</b></button>
+              </div>
+              <button class="qiya-continue" type="button" data-go="battle">继续上次 · 好吃的 · 第 3 关</button>
+            </div>
+            <div class="qiya-screen" data-screen="map">
+              <header class="qiya-top">
+                <div>
+                  <p class="qiya-hi">听力海湾</p>
+                  <p class="qiya-sub">点亮主题世界，把词收进单词本</p>
+                </div>
+                <button class="qiya-iconbtn" type="button" data-go="book" aria-label="单词本">本<span class="qiya-dot" data-review-dot></span></button>
+              </header>
+              <div class="qiya-worlds">
+                <article class="is-done">🏠<b>我家</b><span>3 星通关</span></article>
+                <article class="is-now">🍎<b>好吃的</b><span>第 3 / 6 关</span></article>
+                <article>🐱<b>小动物</b><span>未解锁</span></article>
+                <article>🎨<b>彩虹颜色</b><span>未解锁</span></article>
+                <article>🏫<b>去学校</b><span>未解锁</span></article>
+                <button class="qiya-cam" type="button" data-go="photo">拍照收词</button>
+              </div>
+              <button class="qiya-cta" type="button" data-go="battle">开始闯关</button>
+            </div>
+            <div class="qiya-screen" data-screen="battle">
+              <header class="qiya-battlebar">
+                <span>❤ ❤ ❤</span>
+                <span>4 / 8</span>
+                <span>★ 2</span>
+              </header>
+              <p class="qiya-q">听一听，哪张图是 apple？</p>
+              <button class="qiya-sound" type="button">🔊 apple</button>
+              <div class="qiya-choices" data-choices>
+                <button type="button" data-ok="1">🍎<span>苹果</span></button>
+                <button type="button">🍌<span>香蕉</span></button>
+                <button type="button">🥛<span>牛奶</span></button>
+                <button type="button">🍞<span>面包</span></button>
+              </div>
+              <div class="qiya-hint" data-mnemonic hidden>记忆贝壳：apple 是红苹果砸在桌上，叮！</div>
+            </div>
+            <div class="qiya-screen" data-screen="settle">
+              <p class="qiya-hi">灯塔亮了两颗星</p>
+              <p class="qiya-stars">★ ★ ☆</p>
+              <div class="qiya-result">
+                <p>新会的词</p>
+                <div class="qiya-pills"><span>apple</span><span>cup</span><span>plate</span></div>
+                <p>明天再看</p>
+                <div class="qiya-pills is-warn"><span>fork</span></div>
+              </div>
+              <button class="qiya-cta" type="button" data-go="map">下一关</button>
+              <button class="qiya-ghost" type="button" data-go="book">看单词本</button>
+            </div>
+            <div class="qiya-screen" data-screen="book">
+              <header class="qiya-top">
+                <div>
+                  <p class="qiya-hi">我的单词本</p>
+                  <p class="qiya-sub">所有词都在这里复习</p>
+                </div>
+              </header>
+              <div class="qiya-tabs" role="tablist" aria-label="单词本分类">
+                <button type="button" class="is-on" data-tab="learning">闯关中</button>
+                <button type="button" data-tab="photo">拍照词</button>
+                <button type="button" data-tab="hard">困难词</button>
+                <button type="button" data-tab="done">已掌握</button>
+              </div>
+              <div class="qiya-words" data-word-panel="learning">
+                <article><b>apple</b><span>苹果 · 灯 2/3</span></article>
+                <article><b>cup</b><span>杯子 · 拍照词</span></article>
+                <article><b>plate</b><span>盘子 · 厨房</span></article>
+              </div>
+              <div class="qiya-words" data-word-panel="photo" hidden>
+                <article><b>cup</b><span>今天 16:02 拍的</span></article>
+                <article><b>lamp</b><span>昨天 · 台灯</span></article>
+              </div>
+              <div class="qiya-words" data-word-panel="hard" hidden>
+                <article><b>fork</b><span>错 2 次 · 明天复习</span></article>
+              </div>
+              <div class="qiya-words" data-word-panel="done" hidden>
+                <article><b>cat</b><span>已点亮</span></article>
+                <article><b>mom</b><span>已点亮</span></article>
+              </div>
+              <button class="qiya-cta" type="button" data-go="battle">复习这些词</button>
+            </div>
+            <div class="qiya-screen" data-screen="photo">
+              <div class="qiya-shot">☕</div>
+              <p class="qiya-word">cup</p>
+              <p class="qiya-ipa">/kʌp/  杯子</p>
+              <p class="qiya-sent">I see a cup on the table.</p>
+              <p class="qiya-hint" data-mnemonic>记忆贝壳：cup 像小杯子，口朝上接水。</p>
+              <div class="qiya-row">
+                <button class="qiya-ghost" type="button">听一听</button>
+                <button class="qiya-ghost" type="button">跟我读</button>
+              </div>
+              <button class="qiya-cta" type="button" data-go="battle">用它闯一关</button>
+              <button class="qiya-ghost" type="button" data-go="book">放入单词本</button>
+            </div>
+            <div class="qiya-screen" data-screen="poet">
+              <div class="qiya-scene">
+                <div class="qiya-moon"></div>
+                <div class="qiya-poet">李</div>
+              </div>
+              <p class="qiya-line">床前明月光</p>
+              <p class="qiya-note">白话：床前洒着这一地月光</p>
+              <div class="qiya-row">
+                <button class="qiya-ghost" type="button">请他读</button>
+                <button class="qiya-ghost" type="button">请他讲</button>
+                <button class="qiya-ghost" type="button">一起读</button>
+              </div>
+            </div>
+            <div class="qiya-screen" data-screen="math">
+              <p class="qiya-hi">数理工坊</p>
+              <p class="qiya-sub">正在跟进：二年级 · 退位减法</p>
+              <div class="qiya-pills">
+                <span>换个知识点</span>
+                <span>回退 20 以内</span>
+                <span>只练这点</span>
+              </div>
+              <p class="qiya-sum">32 − 17 = ?</p>
+              <p class="qiya-note">个位 2 不够减 7，先向十位借 1</p>
+              <div class="qiya-pad">
+                <button type="button">1</button><button type="button">2</button><button type="button">3</button>
+                <button type="button">4</button><button type="button">5</button><button type="button">6</button>
+                <button type="button">7</button><button type="button">8</button><button type="button">9</button>
+                <button type="button">0</button><button type="button" class="is-ok">15</button><button type="button" data-go="home">✓</button>
+              </div>
+            </div>
+            <div class="qiya-screen" data-screen="parent">
+              <p class="qiya-hi">家长中心</p>
+              <div class="qiya-report">
+                豆豆这周新认识 18 个生活单词，闯过「我家」，正在点亮「好吃的」。cup、apple 比较熟，fork 还要再看。数学卡在退位减法，每天 8 题即可。
+              </div>
+              <label class="qiya-switch">助记文字梗 <input type="checkbox" checked data-mnemonic-toggle></label>
+              <button class="qiya-ghost" type="button" data-go="home">回到星球</button>
+            </div>
+            <div class="qiya-screen" data-screen="listen">
+              <p class="qiya-hi">磨耳朵电台</p>
+              <div class="qiya-album">🍳 厨房里的苹果</div>
+              <p class="qiya-sub">1:20 / 2:46 · 可跟读</p>
+              <button class="qiya-cta" type="button" data-go="home">听完回星球</button>
+            </div>
+          </div>
+          <nav class="qiya-nav" aria-label="底部导航">
+            <button type="button" class="is-on" data-go="home">星球</button>
+            <button type="button" data-go="map">英语</button>
+            <button type="button" data-go="poet">诗词</button>
+            <button type="button" data-go="math">数学</button>
+          </nav>
+        </div>
+      </div>
+      <p class="qiya-caption">小学主路径：今日探险 → 主题地图 → 听音选图闯关 → 单词本 / 拍照入关</p>
+    </div>
+  </section>
+  <section data-variant="初中学板" aria-label="初中学习模式原型" class="viz-dotted-background" hidden>
+    <div class="qiya-stage">
+      <div class="qiya-phone qiya-teen" id="qiya-teen" data-age="teen">
+        <div class="qiya-bezel">
+          <div class="qiya-statusbar">
+            <span>9:41</span>
+            <span class="qiya-capsule">启芽星球</span>
+            <span class="qiya-signal">●●●</span>
+          </div>
+          <div class="qiya-screens" data-screens>
+            <div class="qiya-screen is-on" data-screen="home">
+              <header class="qiya-top">
+                <div>
+                  <p class="qiya-hi">今日学习</p>
+                  <p class="qiya-sub">先复习，再开新关</p>
+                </div>
+                <button class="qiya-avatar is-plain" type="button" data-go="parent" aria-label="档案">档</button>
+              </header>
+              <div class="qiya-stats">
+                <button type="button" data-go="book"><b>12</b><span>待复习</span></button>
+                <button type="button" data-go="map"><b>3</b><span>新关卡</span></button>
+                <button type="button" data-go="math"><b>68%</b><span>跟进点</span></button>
+              </div>
+              <div class="qiya-list">
+                <button type="button" data-go="battle">英语 · 到期复习关 · 8 词</button>
+                <button type="button" data-go="poet">语文 · 《静夜思》名句与手法</button>
+                <button type="button" data-go="math">数学 · 跟进小学点：退位减法</button>
+              </div>
+            </div>
+            <div class="qiya-screen" data-screen="map">
+              <header class="qiya-top">
+                <div>
+                  <p class="qiya-hi">英语关卡</p>
+                  <p class="qiya-sub">同一套进度，列表更高效</p>
+                </div>
+                <button class="qiya-iconbtn" type="button" data-go="book">本<span class="qiya-dot" data-review-dot></span></button>
+              </header>
+              <div class="qiya-list">
+                <button type="button" data-go="battle">待复习 · kitchen 8 词</button>
+                <button type="button" data-go="battle">新关 · 校园 第 1 关</button>
+                <button type="button" data-go="photo">拍照词 · 可生成专属关</button>
+                <button type="button">已掌握 · 家庭 24 词</button>
+              </div>
+            </div>
+            <div class="qiya-screen" data-screen="battle">
+              <header class="qiya-battlebar">
+                <span>正确率 75%</span>
+                <span>4 / 8</span>
+                <span>1:12</span>
+              </header>
+              <p class="qiya-q">选择 apple 的意思</p>
+              <div class="qiya-choices is-text" data-choices>
+                <button type="button" data-ok="1">苹果</button>
+                <button type="button">申请</button>
+                <button type="button">公寓</button>
+                <button type="button">四月</button>
+              </div>
+              <div class="qiya-hint" data-mnemonic hidden>词根提示：apple 就是水果苹果，别和 apply 搞混。</div>
+            </div>
+            <div class="qiya-screen" data-screen="settle">
+              <p class="qiya-hi">本关掌握度 +6%</p>
+              <div class="qiya-result">
+                <p>已稳住</p>
+                <div class="qiya-pills"><span>apple</span><span>cup</span></div>
+                <p>下次复习</p>
+                <div class="qiya-pills is-warn"><span>fork · 明天</span><span>apply · 4 天后</span></div>
+              </div>
+              <button class="qiya-cta" type="button" data-go="book">去单词本</button>
+            </div>
+            <div class="qiya-screen" data-screen="book">
+              <p class="qiya-hi">单词本</p>
+              <div class="qiya-tabs">
+                <button type="button" class="is-on" data-tab="learning">闯关中</button>
+                <button type="button" data-tab="photo">拍照词</button>
+                <button type="button" data-tab="hard">困难词</button>
+                <button type="button" data-tab="done">已掌握</button>
+              </div>
+              <div class="qiya-words" data-word-panel="learning">
+                <article><b>apple</b><span>掌握 80% · 明天</span></article>
+                <article><b>apply</b><span>易混 · 4 天后</span></article>
+              </div>
+              <div class="qiya-words" data-word-panel="photo" hidden>
+                <article><b>cup</b><span>拍照 · 已插入厨房关</span></article>
+              </div>
+              <div class="qiya-words" data-word-panel="hard" hidden>
+                <article><b>fork</b><span>错 2 次</span></article>
+              </div>
+              <div class="qiya-words" data-word-panel="done" hidden>
+                <article><b>family</b><span>15 天间隔已过</span></article>
+              </div>
+              <button class="qiya-cta" type="button" data-go="battle">复习到期词</button>
+            </div>
+            <div class="qiya-screen" data-screen="photo">
+              <div class="qiya-shot">☕</div>
+              <p class="qiya-word">cup</p>
+              <p class="qiya-ipa">/kʌp/ n. 杯子</p>
+              <p class="qiya-sent">The cup on the table looks clean and warm.</p>
+              <button class="qiya-cta" type="button" data-go="battle">插入当前关</button>
+            </div>
+            <div class="qiya-screen" data-screen="poet">
+              <p class="qiya-hi">静夜思 · 李白</p>
+              <p class="qiya-line">床前明月光，疑是地上霜。</p>
+              <div class="qiya-list">
+                <button type="button">意象：月、霜、故乡</button>
+                <button type="button">手法：比喻 / 对仗</button>
+                <button type="button">默写名句</button>
+              </div>
+            </div>
+            <div class="qiya-screen" data-screen="math">
+              <p class="qiya-hi">小学知识点</p>
+              <p class="qiya-sub">当前跟进：退位减法 · 可换点</p>
+              <div class="qiya-list">
+                <button type="button">退位减法 · 学习中</button>
+                <button type="button">20 以内退位 · 建议回退</button>
+                <button type="button">表内乘法 · 已掌握</button>
+              </div>
+              <p class="qiya-sum">32 − 17 = ?</p>
+              <p class="qiya-note">错因倾向：退位概念不清，不是单纯粗心</p>
+              <div class="qiya-pad">
+                <button type="button">1</button><button type="button">2</button><button type="button">3</button>
+                <button type="button">4</button><button type="button">5</button><button type="button">6</button>
+                <button type="button">7</button><button type="button">8</button><button type="button">9</button>
+                <button type="button">0</button><button type="button" class="is-ok">15</button><button type="button" data-go="home">✓</button>
+              </div>
+            </div>
+            <div class="qiya-screen" data-screen="parent">
+              <p class="qiya-hi">学习报告</p>
+              <div class="qiya-report">本周英语到期复习完成 71%。apply 与 apple 仍会混。建议先看义选词，再进入拼写。数学继续只练退位减法，不要加难度。</div>
+              <button class="qiya-ghost" type="button" data-go="home">返回</button>
+            </div>
+            <div class="qiya-screen" data-screen="listen">
+              <p class="qiya-hi">听力</p>
+              <div class="qiya-album">校园对话 L2</div>
+              <button class="qiya-cta" type="button" data-go="home">返回</button>
+            </div>
+          </div>
+          <nav class="qiya-nav" aria-label="底部导航">
+            <button type="button" class="is-on" data-go="home">今日</button>
+            <button type="button" data-go="map">英语</button>
+            <button type="button" data-go="poet">诗词</button>
+            <button type="button" data-go="math">数学</button>
+          </nav>
+        </div>
+      </div>
+      <p class="qiya-caption">初中学习模式：同一套单词进度，首页改成待复习 / 新关 / 正确率</p>
+    </div>
+  </section>
+
+  <section data-variant="主路径故事板" aria-label="关键页面故事板" class="viz-dotted-background" hidden>
+    <div class="qiya-board">
+      <article>
+        <h3>1. 今日探险</h3>
+        <p>打开就学。四宫格任务：听、闯、读、练。英语默认去闯关，不进词表。</p>
+      </article>
+      <article>
+        <h3>2. 单词闯关地图</h3>
+        <p>主题世界点亮灯塔。我家 / 好吃的 / 小动物。拍照和单词本做固定入口。</p>
+      </article>
+      <article>
+        <h3>3. 听音选图</h3>
+        <p>一屏一题。低龄点图，高年级看义选词。答对进结算，答错出记忆贝壳。</p>
+      </article>
+      <article>
+        <h3>4. 关卡结算</h3>
+        <p>先展示新会的词和待复习词，再给星星。避免只剩打分。</p>
+      </article>
+      <article>
+        <h3>5. 我的单词本</h3>
+        <p>闯关中 / 拍照词 / 困难词 / 已掌握。可立刻拉起复习小关。</p>
+      </article>
+      <article>
+        <h3>6. 拍照入关</h3>
+        <p>拍到杯子得到 cup。听、跟读、放进单词本，并一键用它闯关。</p>
+      </article>
+      <article>
+        <h3>7. 诗人讲解</h3>
+        <p>李白站在月下读《静夜思》。读、讲、一起读。原文不被 AI 改写。</p>
+      </article>
+      <article>
+        <h3>8. 跟进小学知识点</h3>
+        <p>不锁关卡。当前学退位减法就练这个点，不会就回退 20 以内，同型新题修错题。</p>
+      </article>
+    </div>
+  </section>
+</div>
+<style>
+#qiya-planet-proto { font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
+#qiya-planet-proto .qiya-stage { display:flex; flex-direction:column; align-items:center; padding:16px 8px 28px; min-height:760px; }
+#qiya-planet-proto .qiya-phone { width:320px; }
+#qiya-planet-proto .qiya-bezel { background:#111827; border-radius:32px; padding:10px 8px 8px; box-shadow:0 18px 40px rgba(15,23,42,.25); }
+#qiya-planet-proto .qiya-statusbar { display:flex; justify-content:space-between; align-items:center; color:#fff; font-size:11px; padding:0 10px 8px; }
+#qiya-planet-proto .qiya-capsule { background:#000; border:1px solid #4b5563; border-radius:999px; padding:2px 10px; }
+#qiya-planet-proto .qiya-screens { background:#fff; border-radius:22px; height:560px; overflow:hidden; position:relative; }
+#qiya-planet-proto .qiya-screen { display:none; flex-direction:column; gap:10px; height:100%; padding:14px 14px 58px; }
+#qiya-planet-proto .qiya-screen.is-on { display:flex; }
+#qiya-planet-proto .qiya-kid .qiya-screens { background:linear-gradient(180deg,#8ec5ff 0%,#d8f8ea 42%,#ffe7a3 100%); color:#16324f; }
+#qiya-planet-proto .qiya-teen .qiya-screens { background:#f6f7f4; color:#1f2933; }
+#qiya-planet-proto .qiya-hi { margin:0; font-size:20px; font-weight:500; }
+#qiya-planet-proto .qiya-sub { margin:4px 0 0; font-size:12px; opacity:.8; }
+#qiya-planet-proto .qiya-top { display:flex; justify-content:space-between; gap:8px; }
+#qiya-planet-proto .qiya-avatar, #qiya-planet-proto .qiya-iconbtn { width:40px; height:40px; border:0; border-radius:14px; background:#fff; color:#16324f; font-size:18px; position:relative; }
+#qiya-planet-proto .qiya-avatar.is-plain { font-size:13px; }
+#qiya-planet-proto .qiya-dot { position:absolute; top:6px; right:6px; width:8px; height:8px; border-radius:50%; background:#ef4444; }
+#qiya-planet-proto .qiya-hero { display:flex; align-items:center; justify-content:space-between; }
+#qiya-planet-proto .qiya-planet { width:88px; height:88px; border-radius:50%; background:radial-gradient(circle at 30% 30%,#fff7, #35c4a5 42%, #0f766e); box-shadow:inset -10px -12px 0 #0b3b36; }
+#qiya-planet-proto .qiya-streak { background:#fff9; border-radius:999px; padding:8px 12px; font-size:12px; }
+#qiya-planet-proto .qiya-tasks { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+#qiya-planet-proto .qiya-tasks button, #qiya-planet-proto .qiya-worlds article, #qiya-planet-proto .qiya-list button, #qiya-planet-proto .qiya-words article, #qiya-planet-proto .qiya-stats button { background:#fff; border:0; border-radius:16px; padding:10px; text-align:left; color:inherit; }
+#qiya-planet-proto .qiya-tasks span, #qiya-planet-proto .qiya-worlds span { display:block; font-size:11px; opacity:.7; }
+#qiya-planet-proto .qiya-tasks b, #qiya-planet-proto .qiya-worlds b { display:block; margin-top:4px; font-weight:500; }
+#qiya-planet-proto .qiya-continue, #qiya-planet-proto .qiya-cta, #qiya-planet-proto .qiya-ghost, #qiya-planet-proto .qiya-sound { border:0; border-radius:16px; padding:12px; font-weight:500; }
+#qiya-planet-proto .qiya-continue, #qiya-planet-proto .qiya-cta { background:#ff6b4a; color:#fff; }
+#qiya-planet-proto .qiya-ghost, #qiya-planet-proto .qiya-sound { background:#fff; color:#16324f; }
+#qiya-planet-proto .qiya-teen .qiya-cta { background:#0f766e; }
+#qiya-planet-proto .qiya-worlds { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+#qiya-planet-proto .qiya-worlds .is-now { outline:2px solid #ff6b4a; }
+#qiya-planet-proto .qiya-worlds .is-done { background:#ecfdf3; }
+#qiya-planet-proto .qiya-cam { grid-column:1/-1; border:0; border-radius:16px; background:#16324f; color:#fff; padding:10px; }
+#qiya-planet-proto .qiya-q, #qiya-planet-proto .qiya-word, #qiya-planet-proto .qiya-sum, #qiya-planet-proto .qiya-line { margin:0; font-size:22px; font-weight:500; text-align:center; }
+#qiya-planet-proto .qiya-choices { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+#qiya-planet-proto .qiya-choices button { background:#fff; border:0; border-radius:16px; min-height:64px; font-size:16px; }
+#qiya-planet-proto .qiya-choices.is-text button { min-height:48px; }
+#qiya-planet-proto .qiya-choices .is-right { background:#bbf7d0; }
+#qiya-planet-proto .qiya-choices .is-wrong { background:#fecaca; }
+#qiya-planet-proto .qiya-hint, #qiya-planet-proto .qiya-report, #qiya-planet-proto .qiya-album, #qiya-planet-proto .qiya-note, #qiya-planet-proto .qiya-sent, #qiya-planet-proto .qiya-ipa { background:#fff9; border-radius:14px; padding:10px; font-size:13px; text-align:center; }
+#qiya-planet-proto .qiya-stars { text-align:center; font-size:28px; margin:0; }
+#qiya-planet-proto .qiya-pills { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; }
+#qiya-planet-proto .qiya-pills span { background:#fff; border-radius:999px; padding:4px 8px; font-size:12px; }
+#qiya-planet-proto .qiya-pills.is-warn span { background:#ffedd5; }
+#qiya-planet-proto .qiya-tabs { display:flex; gap:4px; }
+#qiya-planet-proto .qiya-tabs button { flex:1; border:0; background:#fff6; border-radius:12px; padding:6px 0; font-size:11px; }
+#qiya-planet-proto .qiya-tabs .is-on { background:#fff; }
+#qiya-planet-proto .qiya-shot { height:92px; border-radius:18px; background:#fff; display:flex; align-items:center; justify-content:center; font-size:48px; }
+#qiya-planet-proto .qiya-row { display:flex; gap:8px; }
+#qiya-planet-proto .qiya-row button { flex:1; }
+#qiya-planet-proto .qiya-scene { height:150px; border-radius:18px; background:linear-gradient(#0b1b3a,#3b2d5c); position:relative; overflow:hidden; }
+#qiya-planet-proto .qiya-moon { position:absolute; right:18px; top:16px; width:36px; height:36px; border-radius:50%; background:#fff3c4; }
+#qiya-planet-proto .qiya-poet { position:absolute; left:24px; bottom:16px; width:54px; height:70px; border-radius:18px 18px 12px 12px; background:#f4d2a6; display:flex; align-items:end; justify-content:center; color:#7c2d12; font-weight:500; padding-bottom:8px; }
+#qiya-planet-proto .qiya-pad { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+#qiya-planet-proto .qiya-pad button { border:0; background:#fff; border-radius:14px; min-height:40px; }
+#qiya-planet-proto .qiya-pad .is-ok { background:#bbf7d0; }
+#qiya-planet-proto .qiya-nav { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; margin-top:8px; }
+#qiya-planet-proto .qiya-nav button { border:0; background:#1f2937; color:#d1d5db; border-radius:12px; padding:8px 0; font-size:12px; }
+#qiya-planet-proto .qiya-nav .is-on { background:#fff; color:#111827; }
+#qiya-planet-proto .qiya-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+#qiya-planet-proto .qiya-stats b { display:block; font-size:22px; font-weight:500; }
+#qiya-planet-proto .qiya-list { display:flex; flex-direction:column; gap:8px; }
+#qiya-planet-proto .qiya-switch { display:flex; justify-content:space-between; background:#fff; border-radius:14px; padding:10px; font-size:13px; }
+#qiya-planet-proto .qiya-caption { margin:12px 0 0; font-size:12px; text-align:center; max-width:320px; color:inherit; }
+#qiya-planet-proto .qiya-hide-mnemonic [data-mnemonic] { display:none !important; }
+
+#qiya-planet-proto .qiya-board { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:16px 8px 28px; min-height:760px; }
+#qiya-planet-proto .qiya-board article { background:light-dark(#fff,#1f2937); color:light-dark(#16324f,#e5e7eb); border-radius:16px; padding:12px; }
+#qiya-planet-proto .qiya-board h3 { margin:0 0 6px; font-size:14px; font-weight:500; }
+#qiya-planet-proto .qiya-board p { margin:0; font-size:12px; line-height:1.45; }
+@media (max-width: 520px) { #qiya-planet-proto .qiya-board { grid-template-columns:1fr; } }
+
+</style>
+<script>
+(() => {
+  const root = document.getElementById("qiya-planet-proto");
+  if (!root) return;
+  const state = { reviewBadge: true, showMnemonic: true };
+
+  function showScreen(phone, name) {
+    phone.querySelectorAll("[data-screen]").forEach((el) => el.classList.toggle("is-on", el.dataset.screen === name));
+    const navMap = { home: "home", listen: "home", map: "map", battle: "map", settle: "map", book: "map", photo: "map", poet: "poet", math: "math", parent: "home" };
+    phone.querySelectorAll(".qiya-nav button").forEach((btn) => btn.classList.toggle("is-on", btn.dataset.go === navMap[name]));
+  }
+
+  function bindPhone(phone) {
+    phone.addEventListener("click", (event) => {
+      const go = event.target.closest("[data-go]");
+      if (go) {
+        showScreen(phone, go.dataset.go);
+        return;
+      }
+      const tab = event.target.closest("[data-tab]");
+      if (tab) {
+        phone.querySelectorAll("[data-tab]").forEach((el) => el.classList.toggle("is-on", el === tab));
+        phone.querySelectorAll("[data-word-panel]").forEach((el) => {
+          el.hidden = el.dataset.wordPanel !== tab.dataset.tab;
+        });
+        return;
+      }
+      const choice = event.target.closest("[data-choices] button");
+      if (choice) {
+        const group = choice.parentElement;
+        group.querySelectorAll("button").forEach((el) => el.classList.remove("is-right", "is-wrong"));
+        choice.classList.add(choice.dataset.ok ? "is-right" : "is-wrong");
+        const hint = phone.querySelector(".qiya-screen.is-on [data-mnemonic]");
+        if (hint && state.showMnemonic) hint.hidden = false;
+        if (choice.dataset.ok) setTimeout(() => showScreen(phone, "settle"), 550);
+      }
+    });
+  }
+
+  function render() {
+    root.querySelectorAll("[data-review-dot]").forEach((el) => { el.style.display = state.reviewBadge ? "block" : "none"; });
+    root.classList.toggle("qiya-hide-mnemonic", !state.showMnemonic);
+  }
+
+  root.querySelectorAll(".qiya-phone").forEach(bindPhone);
+  render();
+
+  if (globalThis.Tweak) {
+    const tweak = new Tweak({ container: root, onChange: render });
+    tweak.addToggle(state, "reviewBadge", { label: "待复习红点" });
+    tweak.addToggle(state, "showMnemonic", { label: "显示助记卡" });
+  }
+})();
+</script>
+
+  <script>
+    (() => {
+      const root = document.getElementById('qiya-planet-proto');
+      const switcher = document.getElementById('qiya-switch');
+      if (!root || !switcher) return;
+      switcher.addEventListener('click', (event) => {
+        const btn = event.target.closest('button[data-variant]');
+        if (!btn) return;
+        switcher.querySelectorAll('button').forEach((el) => el.classList.toggle('is-on', el === btn));
+        root.querySelectorAll('[data-variant]').forEach((el) => {
+          el.hidden = el.getAttribute('data-variant') !== btn.dataset.variant;
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
