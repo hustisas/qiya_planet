@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.study.planet.wp</groupId>
-        <artifactId>sa-parent</artifactId>
+        <artifactId>qiya_planet_backend</artifactId>
         <version>3.0.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>sa-base</artifactId>
+    <artifactId>qiya-planet-base</artifactId>
     <version>3.0.0</version>
 
     <name>qiya_planet-base</name>

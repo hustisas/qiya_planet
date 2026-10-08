@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.study.planet.wp</groupId>
-    <artifactId>sa-parent</artifactId>
+    <artifactId>qiya_planet_backend</artifactId>
     <version>3.0.0</version>
     <packaging>pom</packaging>
 
@@ -11,8 +11,8 @@
     <description>qiya_planet based on SmartAdmin (MIT)</description>
 
 	<modules>
-        <module>sa-base</module>
-		<module>sa-admin</module>
+        <module>qiya-planet-base</module>
+		<module>qiya-planet-admin</module>
     </modules>
 
     <properties>
