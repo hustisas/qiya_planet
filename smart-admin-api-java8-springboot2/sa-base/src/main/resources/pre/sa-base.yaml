@@ -1,7 +1,7 @@
 spring:
   # 数据库连接信息
   datasource:
-    url: jdbc:p6spy:mysql://127.0.0.1:3306/smart_admin_v3?autoReconnect=true&useServerPreparedStmts=false&rewriteBatchedStatements=true&characterEncoding=UTF-8&useSSL=false&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+    url: jdbc:p6spy:mysql://127.0.0.1:3306/qiya_planet?autoReconnect=true&useServerPreparedStmts=false&rewriteBatchedStatements=true&characterEncoding=UTF-8&useSSL=false&allowMultiQueries=true&serverTimezone=Asia/Shanghai
     username: root
     password: SmartAdmin666
     driver-class-name: com.p6spy.engine.spy.P6SpyDriver
@@ -18,7 +18,7 @@ spring:
       login:
         enabled: false
       method:
-        pointcut: net.lab1024.sa..*Service.*
+        pointcut: com.study.planet.wp..*Service.*
 
   # redis 连接池配置信息
   redis:
@@ -98,17 +98,17 @@ file:
   storage:
     mode: local
     local:
-      upload-path: /home/smart_admin_v3/upload/   #文件上传目录
+      upload-path: /home/qiya_planet/upload/   #文件上传目录
       url-prefix:
     cloud:
       region: oss-cn-hangzhou
       endpoint: https://oss-cn-hangzhou.aliyuncs.com
-      bucket-name: 1024lab-smart-admin
+      bucket-name: qiya-planet
       access-key:
       secret-key:
       private-url-expire-seconds: 3600
       # 云计算厂商支持公开的文件访问模式；minio默认是不支持的，对于minio用户可以配置为空
-      public-url-prefix: https://1024lab-smart-admin.oss-cn-hangzhou.aliyuncs.com/
+      public-url-prefix: https://qiya-planet.oss-cn-hangzhou.aliyuncs.com/
 
 # open api配置
 springdoc:

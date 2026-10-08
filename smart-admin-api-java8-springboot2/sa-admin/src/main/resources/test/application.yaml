@@ -7,8 +7,8 @@
 
 # 项目配置: 名称、日志目录
 project:
-  name: sa-admin
-  log-directory: /home/project/smartadmin/test/log
+  name: qiya_planet
+  log-directory: /home/logs/qiya_planet/test
 
 # 项目端口和url根路径
 server:

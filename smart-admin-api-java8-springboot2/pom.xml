@@ -2,13 +2,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.lab1024</groupId>
+    <groupId>com.study.planet.wp</groupId>
     <artifactId>sa-parent</artifactId>
     <version>3.0.0</version>
     <packaging>pom</packaging>
 
-    <name>sa-parent</name>
-    <description>SmartAdmin project</description>
+    <name>qiya_planet</name>
+    <description>qiya_planet based on SmartAdmin (MIT)</description>
 
 	<modules>
         <module>sa-base</module>

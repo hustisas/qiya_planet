@@ -1,13 +1,11 @@
 {
-  "name": "smartadmin",
+  "name": "qiya_planet-web",
   "version": "3.0.0",
   "author": {
-    "name": "1024创新实验室（1024lab）",
-    "email": "lab1024@163.com",
-    "url": "https://www.1024lab.net"
+    "name": "qiya_planet"
   },
   "license": "MIT",
-  "homepage": "https://smartadmin.1024lab.net",
+  "homepage": "",
   "scripts": {
     "localhost": "vite --mode localhost",
     "dev": "vite",
@@ -66,9 +64,5 @@
   },
   "engines": {
     "node": ">=18"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/1024-lab/smart-admin.git"
   }
 }

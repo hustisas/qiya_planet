@@ -1,9 +1,13 @@
 ### 数据库脚本
-默认数据库为Mysql，若为其他数据库，请关注：[SmartAdmin其他数据库](https://smartadmin.vip/views/other/china-db/)
+
+qiya_planet 默认使用 MySQL。初始化脚本基于 SmartAdmin，已将数据库名改为 `qiya_planet`。
 
 #### 第一次
-如果是第一次部署，只需要执行 smart_admin_v3.sql 文件中的SQL语句即可；
 
+如果是第一次部署，执行 `qiya_planet.sql`。
+
+原 SmartAdmin 脚本 `smart_admin_v3.sql` 仍保留作为来源对照，日常请使用 `qiya_planet.sql`。
 
 #### 更新
-跟随 SmartAdmin更新，则需要执行 sql-update-log目录中的SQL脚本，需要按照文件版本从小到大执行；
+
+后续结构变更放到 `sql-update-log` 目录，按版本从小到大执行。
