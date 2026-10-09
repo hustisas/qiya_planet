@@ -276,53 +276,135 @@
         </view>
       </view>
 
-      <view v-else-if="view === 'math'" class="qp-page">
-        <view class="qp-title">数理工坊 · 口算</view>
-        <view class="qp-sub">{{ math.follow }}</view>
-        <view v-if="math.showModes" class="qp-pills">
-          <button class="qp-chip-btn" :class="{ 'is-on': math.mode === 'oral' }" @click="setMathMode('oral')">口算</button>
-          <button class="qp-chip-btn" :class="{ 'is-on': math.mode === 'vert' }" @click="setMathMode('vert')">竖式</button>
-          <button class="qp-chip-btn" :class="{ 'is-on': math.mode === 'listen' }" @click="setMathMode('listen')">听算</button>
-          <button class="qp-chip-btn" :class="{ 'is-on': math.mode === 'cmp' }" @click="setMathMode('cmp')">比大小</button>
-          <button class="qp-chip-btn" :class="{ 'is-on': math.mode === 'unit' }" @click="setMathMode('unit')">厘米和米</button>
-        </view>
-        <view class="qp-sub">{{ math.progress }}</view>
-        <view class="qp-bar"><i :style="{ width: math.bar + '%' }"></i></view>
-        <view v-if="!math.hideFace && !math.showVert" class="qp-question">{{ math.question }}</view>
-        <view v-if="math.pre" class="qp-choices">
-          <button class="qp-choice" @click="submitPre(true)">🍎🍎🍎🍎🍎 更多</button>
-          <button class="qp-choice" @click="submitPre(false)">🍎🍎🍎 少一些</button>
-        </view>
-        <view v-if="math.showVert" class="qp-vert">
-          <view>{{ math.a }}</view>
-          <view>{{ math.b }}</view>
-          <view class="qp-vert-line"></view>
-          <view>{{ math.answerShown }}</view>
-        </view>
-        <view v-if="math.hideFace" class="qp-hint">芽芽在读题。可以先答，也可以点「我听到了」再看题。</view>
-        <view v-if="math.showPad" class="qp-digits">{{ math.digitText }}</view>
-        <view class="qp-hint">{{ math.hint }}</view>
-        <view v-if="math.showWhy" class="qp-pills">
-          <button class="qp-chip-btn" @click="applyWhy('slip')">看错了</button>
-          <button class="qp-chip-btn" @click="applyWhy('gap')">还不会</button>
-          <button class="qp-chip-btn" @click="applyWhy('fast')">算太快</button>
-        </view>
-        <view v-if="math.showCmp" class="qp-choices">
-          <button class="qp-choice" @click="submitMath('>')">大于</button>
-          <button class="qp-choice" @click="submitMath('<')">小于</button>
-          <button class="qp-choice" @click="submitMath('=')">等于</button>
-        </view>
-        <button v-if="math.showHeard" class="qp-ghost" @click="hearMath">我听到了</button>
-        <view v-if="math.showPad" class="qp-pad">
-          <button v-for="key in mathKeys" :key="key" class="qp-key" :class="{ 'qp-key-ok': key === 'ok' }" @click="pressMathKey(key)">{{ key === 'ok' ? '✓' : key === 'del' ? '删' : key }}</button>
-        </view>
-        <view class="qp-pills">
-          <button class="qp-chip-btn" @click="buddyMath">和芽芽比一比</button>
-          <button class="qp-chip-btn" @click="photoMath">拍下我写的</button>
-          <button class="qp-chip-btn" @click="stopMath">先停在这里</button>
-        </view>
-        <button class="qp-ghost" @click="openView('points')">换个知识点</button>
-        <button class="qp-ghost" @click="finishMathDemo">演示：这组做完</button>
+<view v-else-if="view === 'math'" class="qp-page">
+        <template v-if="teach.desk === 'review'">
+          <view class="qp-title">数理工坊 · 昨天的错题</view>
+          <view class="qp-sub">{{ teach.follow }}</view>
+          <view class="qp-card">上次这道：{{ teach.wasPrompt }}。写成了「{{ teach.wasWrong }}」。今天做一道只改数字的，做对就移出。</view>
+          <view v-if="teach.reviewTitle" class="qp-sub">{{ teach.reviewTitle }} · 还剩 {{ teach.dueCount }} 道</view>
+          <view v-if="teach.reviewPrompt" class="qp-question">{{ teach.reviewPrompt }}</view>
+          <view v-if="teach.reviewChoices" class="qp-choices">
+            <button v-for="choice in teach.reviewChoices" :key="choice.id" class="qp-choice" @click="submitReview(choice.id)">{{ choice.text }}</button>
+          </view>
+          <view v-if="teach.reviewPad" class="qp-digits">{{ teach.reviewDigits }}</view>
+          <view class="qp-hint">{{ teach.reviewHint }}</view>
+          <view v-if="teach.reviewPad" class="qp-pad">
+            <button v-for="key in mathKeys" :key="'rv-' + key" class="qp-key" :class="{ 'qp-key-ok': key === 'ok' }" @click="pressReviewKey(key)">{{ key === 'ok' ? '✓' : key === 'del' ? '删' : key }}</button>
+          </view>
+          <button v-if="teach.reviewMiss" class="qp-ghost" @click="holdReview">还没对，留到明天</button>
+          <button class="qp-ghost" @click="skipReviewToLearn">先去今天学</button>
+          <button class="qp-ghost" @click="backToOral">先去口算</button>
+        </template>
+
+        <template v-else-if="teach.desk === 'learn'">
+          <view class="qp-title">数理工坊 · 今天学</view>
+          <view class="qp-sub">{{ teach.follow }}</view>
+          <view class="qp-sub">{{ teach.title }} · {{ teach.stage }}</view>
+          <view class="qp-steps">
+            <view v-for="(name, index) in teach.stepNames" :key="name" class="qp-step" :class="{ 'is-on': teach.stepIndex === index }">{{ name }}</view>
+          </view>
+          <template v-if="teach.finished">
+            <view class="qp-question">这一点学完了</view>
+            <view class="qp-hint">母题和同型题都做对了。没有名次。标记过的错题，明天会再出现。</view>
+            <button class="qp-cta" @click="backToOral">去口算</button>
+            <button class="qp-ghost" @click="replayLearn">再看一遍</button>
+          </template>
+          <template v-else>
+            <view v-if="teach.stepIndex === 0" class="qp-card">{{ teach.explain }}</view>
+            <template v-if="teach.stepIndex === 1">
+              <view class="qp-question">{{ teach.frameTitle }}</view>
+              <view class="qp-dots">
+                <text v-for="(dot, dotIndex) in teach.frameDots" :key="teach.frameTitle + '-' + dotIndex" class="qp-dot">{{ dot }}</text>
+              </view>
+              <view class="qp-hint">{{ teach.frameText }}</view>
+              <view class="qp-frames">
+                <view v-for="(frame, index) in teach.frames" :key="frame.title" class="qp-frame" :class="{ 'is-on': index === teach.frame }">
+                  <b>{{ frame.title }}</b>
+                  <view class="qp-dots">
+                    <text v-for="(dot, dotIndex) in frame.dots" :key="frame.title + '-' + dotIndex" class="qp-dot">{{ dot }}</text>
+                  </view>
+                  <text class="qp-tiny">{{ frame.text }}</text>
+                </view>
+              </view>
+            </template>
+            <view v-if="teach.stepIndex === 2" class="qp-chant">{{ teach.chant }}</view>
+            <template v-if="teach.stepIndex >= 3">
+              <view class="qp-sub">{{ teach.progress }}</view>
+              <view class="qp-question">{{ teach.prompt }}</view>
+              <view v-if="teach.choices" class="qp-choices">
+                <button v-for="choice in teach.choices" :key="choice.id" class="qp-choice" @click="submitLearn(choice.id)">{{ choice.text }}</button>
+              </view>
+              <view v-if="teach.showPad" class="qp-digits">{{ teach.digitText }}</view>
+              <view class="qp-hint">{{ teach.hint }}</view>
+              <view v-if="teach.showPad" class="qp-pad">
+                <button v-for="key in mathKeys" :key="'ln-' + key" class="qp-key" :class="{ 'qp-key-ok': key === 'ok' }" @click="pressLearnKey(key)">{{ key === 'ok' ? '✓' : key === 'del' ? '删' : key }}</button>
+              </view>
+              <button v-if="teach.miss" class="qp-ghost" @click="markLearnMiss">标记错题，明天再练</button>
+            </template>
+            <button v-if="teach.stepIndex < 3" class="qp-cta" @click="nextLearnStep">{{ teach.nextLabel }}</button>
+            <button class="qp-ghost" @click="backToOral">先去口算</button>
+          </template>
+        </template>
+
+        <template v-else>
+          <view class="qp-title">数理工坊 · 口算</view>
+          <view class="qp-sub">{{ math.follow }}</view>
+          <button class="qp-item" @click="openLearn">
+            <b>{{ teach.entryTitle }}</b>
+            <text class="qp-tiny">{{ teach.entryNote }}</text>
+          </button>
+          <button v-if="teach.dueCount" class="qp-item" @click="openReview">
+            <b>昨天的错题 · {{ teach.dueCount }} 道</b>
+            <text class="qp-tiny">到日子了。先做同型新题，做对就移出。</text>
+          </button>
+          <view v-if="teach.waitCount && !teach.dueCount" class="qp-hint">已标记 {{ teach.waitCount }} 道错题。还没到明天，今天可以继续练。</view>
+          <view v-if="math.showModes" class="qp-pills">
+            <button class="qp-chip-btn" :class="{ 'is-on': math.mode === 'oral' }" @click="setMathMode('oral')">口算</button>
+            <button class="qp-chip-btn" :class="{ 'is-on': math.mode === 'vert' }" @click="setMathMode('vert')">竖式</button>
+            <button class="qp-chip-btn" :class="{ 'is-on': math.mode === 'listen' }" @click="setMathMode('listen')">听算</button>
+            <button class="qp-chip-btn" :class="{ 'is-on': math.mode === 'cmp' }" @click="setMathMode('cmp')">比大小</button>
+            <button class="qp-chip-btn" :class="{ 'is-on': math.mode === 'unit' }" @click="setMathMode('unit')">厘米和米</button>
+          </view>
+          <view class="qp-sub">{{ math.progress }}</view>
+          <view class="qp-bar"><i :style="{ width: math.bar + '%' }"></i></view>
+          <view v-if="!math.hideFace && !math.showVert" class="qp-question">{{ math.question }}</view>
+          <view v-if="math.pre" class="qp-choices">
+            <button class="qp-choice" @click="submitPre(true)">🍎🍎🍎🍎🍎 更多</button>
+            <button class="qp-choice" @click="submitPre(false)">🍎🍎🍎 少一些</button>
+          </view>
+          <button v-if="math.pre && math.preMiss" class="qp-ghost" @click="markPreWrong">标记错题，明天再比</button>
+          <view v-if="math.showVert" class="qp-vert">
+            <view>{{ math.a }}</view>
+            <view>{{ math.b }}</view>
+            <view class="qp-vert-line"></view>
+            <view>{{ math.answerShown }}</view>
+          </view>
+          <view v-if="math.hideFace" class="qp-hint">芽芽在读题。可以先答，也可以点「我听到了」再看题。</view>
+          <view v-if="math.showPad" class="qp-digits">{{ math.digitText }}</view>
+          <view class="qp-hint">{{ math.hint }}</view>
+          <view v-if="math.showWhy" class="qp-pills">
+            <button class="qp-chip-btn" @click="applyWhy('slip')">看错了</button>
+            <button class="qp-chip-btn" @click="applyWhy('gap')">还不会</button>
+            <button class="qp-chip-btn" @click="applyWhy('fast')">算太快</button>
+            <button class="qp-chip-btn" @click="markOralWrong">标记错题</button>
+          </view>
+          <view v-if="math.showCmp" class="qp-choices">
+            <button class="qp-choice" @click="submitMath('>')">大于</button>
+            <button class="qp-choice" @click="submitMath('<')">小于</button>
+            <button class="qp-choice" @click="submitMath('=')">等于</button>
+          </view>
+          <button v-if="math.showHeard" class="qp-ghost" @click="hearMath">我听到了</button>
+          <view v-if="math.showPad" class="qp-pad">
+            <button v-for="key in mathKeys" :key="key" class="qp-key" :class="{ 'qp-key-ok': key === 'ok' }" @click="pressMathKey(key)">{{ key === 'ok' ? '✓' : key === 'del' ? '删' : key }}</button>
+          </view>
+          <view class="qp-pills">
+            <button class="qp-chip-btn" @click="buddyMath">和芽芽比一比</button>
+            <button class="qp-chip-btn" @click="photoMath">拍下我写的</button>
+            <button class="qp-chip-btn" @click="stopMath">先停在这里</button>
+          </view>
+          <button class="qp-ghost" @click="openView('points')">换个知识点</button>
+          <button class="qp-ghost" @click="finishMathDemo">演示：这组做完</button>
+        </template>
       </view>
 
       <view v-else-if="view === 'mreport'" class="qp-page">
@@ -336,6 +418,7 @@
       <view v-else-if="view === 'points'" class="qp-page">
         <view class="qp-title">小学知识点</view>
         <view class="qp-sub">{{ info.point }}</view>
+        <view class="qp-card">想先听明白，点口算页的「先学再练」。做错要自己点标记，第二天才会再出现。</view>
         <button class="qp-item" :class="{ 'is-pick': pointOn('main') }" @click="setMathPoint('main', '当前跟进：退位减法。', true)">
           <b>退位减法</b><text class="qp-tiny">二年级 · 当前跟进</text>
         </button>
@@ -502,6 +585,21 @@ import {
   currentPoem,
   currentQuestion,
   finishMathDemo,
+  backToOral,
+  holdReview,
+  markLearnMiss,
+  markOralWrong,
+  markPreWrong,
+  nextLearnStep,
+  openLearn,
+  openReview,
+  pressLearnKey,
+  pressReviewKey,
+  replayLearn,
+  skipReviewToLearn,
+  submitLearn,
+  submitReview,
+  teachView,
   gotWords,
   gradeInfo,
   hearMath,
@@ -586,6 +684,7 @@ const saved = computed(() => savedPhotoWord());
 const poem = computed(() => currentPoem());
 const line = computed(() => currentLine());
 const math = computed(() => mathView());
+const teach = computed(() => teachView());
 const worldList = computed(() => worlds());
 const starWords = computed(() => {
   if (play.stars >= 3) return "三颗星";

@@ -191,3 +191,250 @@ export function makeRepair(kind, bank, index, gapStreak) {
   const kindName = bank === "small" ? "20 以内退位" : "退位减法";
   return subItem(pair[0], pair[1], kindName, WHY_HINT[kind] || WHY_HINT.slip);
 }
+
+function lessonItem(prompt, answer, say, choices) {
+  return {
+    prompt: prompt,
+    answer: String(answer),
+    say: say,
+    choices: choices || null,
+  };
+}
+
+function copyLessonItem(item) {
+  const choices = [];
+  if (item.choices) {
+    for (let i = 0; i < item.choices.length; i += 1) {
+      choices.push({ id: item.choices[i].id, text: item.choices[i].text });
+    }
+  }
+  return {
+    prompt: item.prompt,
+    answer: item.answer,
+    say: item.say,
+    choices: item.choices ? choices : null,
+  };
+}
+
+function pickPool(pool, seed, avoidPrompt) {
+  let start = 0;
+  if (seed) start = Math.abs(seed) % pool.length;
+  let picked = pool[start];
+  for (let n = 0; n < pool.length; n += 1) {
+    const item = pool[(start + n) % pool.length];
+    if (item.prompt !== avoidPrompt) {
+      picked = item;
+      break;
+    }
+  }
+  return copyLessonItem(picked);
+}
+
+const COMPARE_CHOICES = [
+  { id: ">", text: "大于" },
+  { id: "<", text: "小于" },
+  { id: "=", text: "等于" },
+];
+
+export const MATH_LESSONS = [
+  {
+    id: "more-less",
+    bands: ["pre"],
+    title: "比多少",
+    stage: "学前",
+    explain: "两堆放在一起。先一个一个数，再看哪一堆更多。",
+    chant: "先数数，再比比，多的那边点一点。",
+    frames: [
+      { title: "先看左边", text: "左边 2 个", dots: ["🍎", "🍎"] },
+      { title: "再看右边", text: "右边 3 个", dots: ["🍎", "🍎", "🍎"] },
+      { title: "比一比", text: "3 比 2 多，右边更多", dots: ["🍎", "🍎", "🍎"] },
+    ],
+    model: lessonItem("哪一堆苹果更多？", "right", "右边 3 个，左边 2 个。右边更多。", [
+      { id: "left", text: "🍎🍎 左边" },
+      { id: "right", text: "🍎🍎🍎 右边" },
+    ]),
+    drills: [
+      lessonItem("哪一堆小狗更多？", "left", "左边 2 只，右边 1 只。左边更多。", [
+        { id: "left", text: "🐶🐶 左边" },
+        { id: "right", text: "🐶 右边" },
+      ]),
+      lessonItem("哪一堆星星更多？", "left", "左边 4 颗，右边 2 颗。左边更多。", [
+        { id: "left", text: "🌟🌟🌟🌟 左边" },
+        { id: "right", text: "🌟🌟 右边" },
+      ]),
+      lessonItem("哪一堆小车更多？", "right", "左边 1 辆，右边 2 辆。右边更多。", [
+        { id: "left", text: "🚗 左边" },
+        { id: "right", text: "🚗🚗 右边" },
+      ]),
+    ],
+  },
+  {
+    id: "split-five",
+    bands: ["pre"],
+    title: "5 的分与合",
+    stage: "学前",
+    explain: "5 可以分成两份。两份合起来，还是 5。",
+    chant: "分一分，合回来，两份加起还是它。",
+    frames: [
+      { title: "这是 5 个", text: "先看完整的 5 个", dots: ["🍎", "🍎", "🍎", "🍎", "🍎"] },
+      { title: "拿出 2 个", text: "先分成 2 个", dots: ["🍎", "🍎"] },
+      { title: "还剩 3 个", text: "2 和 3 合起来还是 5", dots: ["🍎", "🍎", "🍎"] },
+    ],
+    model: lessonItem("5 可以分成 2 和几？", "3", "2 和 3 合起来是 5。", [
+      { id: "1", text: "1" },
+      { id: "3", text: "3" },
+      { id: "4", text: "4" },
+    ]),
+    drills: [
+      lessonItem("5 可以分成 1 和几？", "4", "1 和 4 合起来是 5。", [
+        { id: "2", text: "2" },
+        { id: "4", text: "4" },
+        { id: "5", text: "5" },
+      ]),
+      lessonItem("4 可以分成 1 和几？", "3", "1 和 3 合起来是 4。", [
+        { id: "2", text: "2" },
+        { id: "3", text: "3" },
+        { id: "4", text: "4" },
+      ]),
+      lessonItem("5 可以分成 4 和几？", "1", "4 和 1 合起来是 5。", [
+        { id: "1", text: "1" },
+        { id: "2", text: "2" },
+        { id: "3", text: "3" },
+      ]),
+    ],
+  },
+  {
+    id: "add-ten",
+    bands: ["g12"],
+    title: "10 以内加法",
+    stage: "一二年级",
+    explain: "把两小堆合到一起数。不满 10，就不用进位。",
+    chant: "合在一起数一数，不满十，直接数。",
+    frames: [
+      { title: "先拿 3 个", text: "第一堆是 3 个", dots: ["●", "●", "●"] },
+      { title: "再拿 2 个", text: "第二堆是 2 个", dots: ["●", "●"] },
+      { title: "合起来", text: "3 和 2 合起来是 5", dots: ["●", "●", "●", "●", "●"] },
+    ],
+    model: lessonItem("3 + 2 = ?", "5", "3 个再添 2 个，一共 5 个。"),
+    drills: [
+      lessonItem("4 + 3 = ?", "7", "4 个再添 3 个，一共 7 个。"),
+      lessonItem("6 + 2 = ?", "8", "6 个再添 2 个，一共 8 个。"),
+      lessonItem("5 + 4 = ?", "9", "5 个再添 4 个，一共 9 个。不满 10。"),
+    ],
+  },
+  {
+    id: "borrow-twenty",
+    bands: ["g12", "mid"],
+    title: "20 以内退位",
+    stage: "一二年级",
+    explain: "个位不够减，就向十位借 1。借来的 1 个十，等于 10 个一。",
+    chant: "个位不够向十借，借一当十再相减。",
+    frames: [
+      { title: "13 减 5", text: "十位 1，个位 3。个位不够减 5", dots: ["十", "3"] },
+      { title: "向十位借", text: "借来的 1 个十，变成 10 个一", dots: ["10"] },
+      { title: "再减", text: "13 个一减 5 个一，还剩 8", dots: ["8"] },
+    ],
+    model: lessonItem("13 − 5 = ?", "8", "个位 3 不够减 5。向十位借 1，13−5=8。"),
+    drills: [
+      lessonItem("12 − 5 = ?", "7", "个位 2 不够减 5。借 1 以后，12−5=7。"),
+      lessonItem("14 − 6 = ?", "8", "个位 4 不够减 6。借 1 以后，14−6=8。"),
+      lessonItem("15 − 7 = ?", "8", "个位 5 不够减 7。借 1 以后，15−7=8。"),
+    ],
+  },
+  {
+    id: "borrow-tens",
+    bands: ["g36", "mid"],
+    title: "退位减法",
+    stage: "三到六年级",
+    explain: "跟 20 以内一样。个位不够，向十位借 1，借走以后十位少 1。这就是口算里的退位减法。",
+    chant: "个位不够向十借，十位少一记心里。",
+    frames: [
+      { title: "32 减 17", text: "个位 2 不够减 7", dots: ["32", "17"] },
+      { title: "向十位借", text: "十位 3 变成 2，个位变成 12", dots: ["12"] },
+      { title: "再减", text: "12−7=5，十位 2−1=1，得 15", dots: ["15"] },
+    ],
+    model: lessonItem("32 − 17 = ?", "15", "个位 2 不够减 7。借 1 后，12−7=5，十位 2−1=1，得 15。"),
+    drills: [
+      lessonItem("41 − 16 = ?", "25", "个位 1 不够减 6。借 1 后，11−6=5，十位 3−1=2，得 25。"),
+      lessonItem("53 − 28 = ?", "25", "个位 3 不够减 8。借 1 后，13−8=5，十位 4−2=2，得 25。"),
+      lessonItem("70 − 26 = ?", "44", "个位 0 不够减 6。借 1 后，10−6=4，十位 6−2=4，得 44。"),
+    ],
+  },
+  {
+    id: "times-row",
+    bands: ["g36"],
+    title: "三四十二",
+    stage: "三到六年级",
+    explain: "3 个 4 合在一起是 12。口诀用来记住。今天只复习这一条，不另开一组新题。",
+    chant: "三四十二。3 堆，每堆 4 个。",
+    frames: [
+      { title: "第 1 堆", text: "一堆 4 个", dots: ["●", "●", "●", "●"] },
+      { title: "第 2 堆", text: "又是 4 个", dots: ["●", "●", "●", "●"] },
+      { title: "第 3 堆", text: "再 4 个。三四十二", dots: ["12"] },
+    ],
+    model: lessonItem("3 × 4 = ?", "12", "3 个 4 是 12。三四十二。"),
+    drills: [
+      lessonItem("3 × 2 = ?", "6", "3 个 2 是 6。三二得六。"),
+      lessonItem("3 × 5 = ?", "15", "3 个 5 是 15。三五十五。"),
+      lessonItem("3 × 3 = ?", "9", "3 个 3 是 9。三三得九。"),
+    ],
+  },
+  {
+    id: "around-box",
+    bands: ["g36"],
+    title: "长方形周长",
+    stage: "三到六年级",
+    explain: "周长是绕一圈的长度。长方形对边一样长，把两条长和两条宽加起来。",
+    chant: "绕一圈，长加宽，再加长，再加宽。",
+    frames: [
+      { title: "两条长", text: "4 厘米加 4 厘米", dots: ["4", "4"] },
+      { title: "两条宽", text: "2 厘米加 2 厘米", dots: ["2", "2"] },
+      { title: "绕一圈", text: "4+2+4+2=12", dots: ["12"] },
+    ],
+    model: lessonItem("长 4 厘米，宽 2 厘米，周长是多少厘米？", "12", "4+2+4+2=12。绕一圈是 12 厘米。"),
+    drills: [
+      lessonItem("长 5 厘米，宽 3 厘米，周长是多少厘米？", "16", "5+3+5+3=16。绕一圈是 16 厘米。"),
+      lessonItem("长 6 厘米，宽 2 厘米，周长是多少厘米？", "16", "6+2+6+2=16。绕一圈是 16 厘米。"),
+      lessonItem("长 4 厘米，宽 3 厘米，周长是多少厘米？", "14", "4+3+4+3=14。绕一圈是 14 厘米。"),
+    ],
+  },
+];
+
+export function lessonById(id) {
+  for (let i = 0; i < MATH_LESSONS.length; i += 1) {
+    if (MATH_LESSONS[i].id === id) return MATH_LESSONS[i];
+  }
+  return null;
+}
+
+export function lessonsForGrade(gradeKey) {
+  const list = [];
+  for (let i = 0; i < MATH_LESSONS.length; i += 1) {
+    if (MATH_LESSONS[i].bands.indexOf(gradeKey) >= 0) list.push(MATH_LESSONS[i]);
+  }
+  if (!list.length) return [MATH_LESSONS[0]];
+  return list;
+}
+
+export function redoItem(lesson, seed, avoidPrompt) {
+  const pool = [lesson.model].concat(lesson.drills);
+  return pickPool(pool, seed, avoidPrompt);
+}
+
+export function redoCompare(seed, avoidPrompt) {
+  const pool = [
+    lessonItem("16 ○ 9", ">", "16 比 9 大。", COMPARE_CHOICES),
+    lessonItem("8 ○ 11", "<", "8 比 11 小。", COMPARE_CHOICES),
+    lessonItem("14 ○ 14", "=", "两个数一样大。", COMPARE_CHOICES),
+    lessonItem("20 ○ 15", ">", "20 比 15 大。", COMPARE_CHOICES),
+  ];
+  return pickPool(pool, seed, avoidPrompt);
+}
+
+export function redoUnit(seed, avoidPrompt) {
+  const pool = [];
+  for (let i = 0; i < UNIT_SET.length; i += 1) {
+    pool.push(lessonItem(UNIT_SET[i].text, UNIT_SET[i].answer, UNIT_SET[i].hint));
+  }
+  return pickPool(pool, seed, avoidPrompt);
+}

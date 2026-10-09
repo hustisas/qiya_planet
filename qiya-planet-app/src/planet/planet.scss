@@ -680,3 +680,84 @@
 .qp-rec::after {
   border: 0;
 }
+
+.qp-steps {
+  display: flex;
+  gap: 8rpx;
+  margin-top: 16rpx;
+}
+
+.qp-step {
+  flex: 1;
+  padding: 10rpx 0;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.8);
+  color: #8a7568;
+  font-size: 22rpx;
+  text-align: center;
+}
+
+.qp-step.is-on {
+  background: #ff6b4a;
+  color: #fff;
+  font-weight: 700;
+}
+
+.qp-frames {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  margin-top: 18rpx;
+}
+
+.qp-frame {
+  padding: 16rpx 18rpx;
+  border-radius: 22rpx;
+  background: rgba(255, 255, 255, 0.72);
+  color: #8a7568;
+}
+
+.qp-frame.is-on {
+  background: #fff4ec;
+  color: #2c241c;
+}
+
+.qp-dots {
+  margin: 8rpx 0;
+  font-size: 34rpx;
+  font-weight: 800;
+  letter-spacing: 4rpx;
+  text-align: center;
+}
+
+.qp-frame.is-on .qp-dot {
+  display: inline-block;
+  animation: qp-pop 0.7s ease;
+}
+
+.qp-chant {
+  margin-top: 20rpx;
+  padding: 32rpx 22rpx;
+  border-radius: 28rpx;
+  background: #fff7f0;
+  color: #c45332;
+  font-size: 40rpx;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.45;
+}
+
+.qp-grade-pre .qp-chant {
+  font-size: 46rpx;
+}
+
+@keyframes qp-pop {
+  0% {
+    transform: translateY(10rpx);
+    opacity: 0.2;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

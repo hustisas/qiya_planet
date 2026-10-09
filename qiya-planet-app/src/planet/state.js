@@ -9,8 +9,13 @@ import {
   SPELL_WORDS,
   UNIT_SET,
   WORLDS,
+  lessonById,
+  lessonsForGrade,
   makeRepair,
   poemById,
+  redoCompare,
+  redoItem,
+  redoUnit,
 } from "./content.js";
 import { GRADE_ORDER, GRADES } from "./grades.js";
 import { assessSpeech } from "./speech-api.js";
@@ -67,6 +72,23 @@ export const planet = reactive({
     awaitingWhy: false,
     digits: "",
     unitIndex: 0,
+    preMiss: false,
+    desk: "oral",
+    reviewDay: "",
+    reviewDigits: "",
+    reviewMiss: false,
+    learn: {
+      lessonId: "",
+      day: "",
+      step: 0,
+      frame: 0,
+      drill: 0,
+      digits: "",
+      miss: false,
+      finished: false,
+      lastGuess: "",
+    },
+    wrongs: [],
   },
 });
 
@@ -143,6 +165,17 @@ function savePlanet() {
       streak: math.streak,
       gapStreak: math.gapStreak,
       unitIndex: math.unitIndex,
+      desk: math.desk || "oral",
+      reviewDay: math.reviewDay || "",
+      learn: {
+        lessonId: math.learn.lessonId,
+        day: math.learn.day,
+        step: math.learn.step,
+        frame: math.learn.frame,
+        drill: math.learn.drill,
+        finished: !!math.learn.finished,
+      },
+      wrongs: math.wrongs || [],
     },
   });
 }
@@ -188,6 +221,19 @@ export function boot() {
     if (typeof saved.math.streak === "number") math.streak = saved.math.streak;
     if (typeof saved.math.gapStreak === "number") math.gapStreak = saved.math.gapStreak;
     if (typeof saved.math.unitIndex === "number") math.unitIndex = saved.math.unitIndex;
+    if (!math.learn) math.learn = defaultLearn();
+    if (saved.math.learn) {
+      const src = saved.math.learn;
+      if (src.lessonId) math.learn.lessonId = String(src.lessonId);
+      if (src.day) math.learn.day = String(src.day);
+      if (typeof src.step === "number") math.learn.step = src.step;
+      if (typeof src.frame === "number") math.learn.frame = src.frame;
+      if (typeof src.drill === "number") math.learn.drill = src.drill;
+      if (typeof src.finished === "boolean") math.learn.finished = src.finished;
+    }
+    math.wrongs = cleanWrongs(saved.math.wrongs);
+    if (saved.math.desk === "learn" || saved.math.desk === "review" || saved.math.desk === "oral") math.desk = saved.math.desk;
+    if (typeof saved.math.reviewDay === "string") math.reviewDay = saved.math.reviewDay;
   }
   refreshSpeakQuota();
 }
@@ -222,10 +268,12 @@ export function homeOf(tab) {
 
 export function ensureTab(tab) {
   if (tabOf(play.view) !== tab) play.view = homeOf(tab);
+  if (tab === "math") prepareMathDesk();
 }
 
 export function openView(name) {
   if (name !== "spell") stopSpellAudio();
+  if (name === "math") prepareMathDesk();
   play.view = name;
   const target = TAB_ROUTE[tabOf(name)];
   const pages = getCurrentPages();
@@ -1024,6 +1072,7 @@ export function mathView() {
     digitText: digitText,
     hint: pre ? "点更多的那一堆。不用键盘。" : hint,
     pre: pre,
+    preMiss: !!math.preMiss,
     a: item.a != null ? String(item.a) : "",
     b: item.b != null ? "− " + item.b : "",
     answerShown: math.digits ? math.digits : "?",
@@ -1051,10 +1100,13 @@ export function previewTitle() {
 export function reportText() {
   const kind = planet.math.bank === "small" ? "20 以内退位" : "退位减法";
   const math = planet.math;
-  if (math.index <= 0) return "这组还没做完，现在是 0 / 10。可以先停。明天还练" + kind + "。没有名次。";
+  let tail = "";
+  const waiting = waitingCount();
+  if (waiting) tail = " 标记了 " + waiting + " 道错题，明天打开会先复习。";
+  if (math.index <= 0) return "这组还没做完，现在是 0 / 10。可以先停。明天还练" + kind + "。没有名次。" + tail;
   const unstable = math.gapStreak > 0 || math.correct < math.index;
   const stable = unstable ? kind + "还不太稳。" : kind + "更稳了一点。";
-  return "做了 " + math.index + " / 10 题，第一次就对了 " + math.correct + " 道。" + stable + "明天还练这个点。没有名次。";
+  return "做了 " + math.index + " / 10 题，第一次就对了 " + math.correct + " 道。" + stable + "明天还练这个点。没有名次。" + tail;
 }
 
 export function pointOn(kind) {
@@ -1094,6 +1146,7 @@ export function setMathPoint(kind, act, jump) {
   math.digits = "";
   math.heard = false;
   math.unitIndex = 0;
+  alignLearnToPoint();
   savePlanet();
   toast(act || (math.bank === "small" ? "先回去修 20 以内退位。今天这组换成更小的数。" : "当前跟进：退位减法。"));
   if (jump) openView("math");
@@ -1115,8 +1168,9 @@ export function submitMath(guess) {
   if (String(guess) !== String(expected(item))) {
     math.awaitingWhy = true;
     math.streak = 0;
+    math.lastGuess = guess ? String(guess) : "";
     math.digits = "";
-    toast("还没对。先选看错了、还不会或算太快，再做一道新题。");
+    toast("还没对。先选看错了、还不会或算太快，再做一道新题。也可以标记错题，明天再练。");
     return;
   }
   math.awaitingWhy = false;
@@ -1185,7 +1239,13 @@ export function pressMathKey(key) {
 }
 
 export function submitPre(more) {
-  toast(more ? "这一堆更多。学前点大图，不用键盘。" : "这一堆少一些。");
+  if (more) {
+    planet.math.preMiss = false;
+    toast("这一堆更多。学前点大图，不用键盘。");
+    return;
+  }
+  planet.math.preMiss = true;
+  toast("这一堆少一些。想记下来，可以标记，明天再比。");
 }
 
 export function buddyMath() {
@@ -1205,7 +1265,8 @@ export function photoMath() {
   const written = math.mode === "cmp" ? (ans === ">" ? "<" : ">") : String(Math.max(0, Number(ans) - 1));
   math.awaitingWhy = true;
   math.digits = "";
-  toast("拍到你写的是 " + written + "。只检查这张纸，不去搜题。先选原因。");
+  math.lastGuess = written;
+  toast("拍到你写的是 " + written + "。只检查这张纸，不去搜题。先选原因。也可以标记错题。");
 }
 
 export function stopMath() {
@@ -1241,10 +1302,593 @@ export function finishMathDemo() {
   openView("mreport");
 }
 
+function dateKey(date) {
+  const y = date.getFullYear();
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  const mm = m < 10 ? "0" + m : String(m);
+  const dd = d < 10 ? "0" + d : String(d);
+  return y + "-" + mm + "-" + dd;
+}
+
+function todayKey() {
+  return dateKey(new Date());
+}
+
+function tomorrowKey() {
+  const date = new Date();
+  date.setDate(date.getDate() + 1);
+  return dateKey(date);
+}
+
+function defaultLearn() {
+  return {
+    lessonId: "",
+    day: "",
+    step: 0,
+    frame: 0,
+    drill: 0,
+    digits: "",
+    miss: false,
+    finished: false,
+    lastGuess: "",
+  };
+}
+
+function resetLearnProgress(learn, day) {
+  learn.day = day;
+  learn.step = 0;
+  learn.frame = 0;
+  learn.drill = 0;
+  learn.digits = "";
+  learn.miss = false;
+  learn.finished = false;
+  learn.lastGuess = "";
+}
+
+function ensureLearn() {
+  const math = planet.math;
+  if (!math.learn) math.learn = defaultLearn();
+  if (!math.wrongs) math.wrongs = [];
+  const learn = math.learn;
+  const today = todayKey();
+  const list = lessonsForGrade(planet.gradeKey);
+  const known = lessonById(learn.lessonId);
+  if (!known) {
+    learn.lessonId = list[0].id;
+    resetLearnProgress(learn, today);
+    return true;
+  }
+  if (learn.finished && learn.day && learn.day !== today) {
+    let nextId = list[0].id;
+    for (let i = 0; i < list.length; i += 1) {
+      if (list[i].id === learn.lessonId) {
+        nextId = list[(i + 1) % list.length].id;
+        break;
+      }
+    }
+    learn.lessonId = nextId;
+    resetLearnProgress(learn, today);
+    return true;
+  }
+  return false;
+}
+
+function cleanChoices(list) {
+  if (!list || !list.length) return null;
+  const choices = [];
+  for (let i = 0; i < list.length; i += 1) {
+    const item = list[i];
+    if (!item || item.id == null || !item.text) continue;
+    choices.push({ id: String(item.id), text: String(item.text) });
+  }
+  return choices.length ? choices : null;
+}
+
+function cleanRedo(redo) {
+  if (!redo || !redo.prompt || redo.answer == null) return null;
+  return {
+    prompt: String(redo.prompt),
+    answer: String(redo.answer),
+    say: redo.say ? String(redo.say) : "",
+    choices: cleanChoices(redo.choices),
+  };
+}
+
+function cleanWrongs(list) {
+  if (!list || !list.length) return [];
+  const next = [];
+  for (let i = 0; i < list.length; i += 1) {
+    const item = list[i];
+    if (!item || !item.id || !item.prompt || item.answer == null) continue;
+    next.push({
+      id: String(item.id),
+      lessonId: item.lessonId ? String(item.lessonId) : "",
+      title: item.title ? String(item.title) : "错题",
+      prompt: String(item.prompt),
+      answer: String(item.answer),
+      wrong: item.wrong ? String(item.wrong) : "",
+      markedOn: item.markedOn ? String(item.markedOn) : "",
+      reviewOn: item.reviewOn ? String(item.reviewOn) : "",
+      status: item.status === "done" ? "done" : "wait",
+      say: item.say ? String(item.say) : "",
+      choices: cleanChoices(item.choices),
+      redo: cleanRedo(item.redo),
+    });
+  }
+  return next.length > 40 ? next.slice(next.length - 40) : next;
+}
+
+function dueWrongs() {
+  const today = todayKey();
+  const list = planet.math.wrongs || [];
+  const due = [];
+  for (let i = 0; i < list.length; i += 1) {
+    const item = list[i];
+    if (item.status !== "done" && item.reviewOn && item.reviewOn <= today) due.push(item);
+  }
+  return due;
+}
+
+function waitingCount() {
+  const list = planet.math.wrongs || [];
+  let count = 0;
+  for (let i = 0; i < list.length; i += 1) {
+    if (list[i].status !== "done") count += 1;
+  }
+  return count;
+}
+
+function promptSeed(text) {
+  let seed = 0;
+  const value = text || "";
+  for (let i = 0; i < value.length; i += 1) seed += value.charCodeAt(i);
+  return seed;
+}
+
+function ensureRedo(wrong) {
+  if (wrong.redo && wrong.redo.prompt) return;
+  const seed = promptSeed(wrong.prompt);
+  if (wrong.answer === ">" || wrong.answer === "<" || wrong.answer === "=") {
+    wrong.redo = redoCompare(seed, wrong.prompt);
+    return;
+  }
+  if (wrong.lessonId === "unit-length") {
+    wrong.redo = redoUnit(seed, wrong.prompt);
+    return;
+  }
+  const lesson = lessonById(wrong.lessonId) || lessonsForGrade(planet.gradeKey)[0];
+  wrong.redo = redoItem(lesson, seed, wrong.prompt);
+}
+
+function prepareMathDesk() {
+  const changed = ensureLearn();
+  const due = dueWrongs();
+  const today = todayKey();
+  if (due.length && planet.math.reviewDay !== today && planet.math.desk !== "review") {
+    planet.math.desk = "review";
+    planet.math.reviewDigits = "";
+    planet.math.reviewMiss = false;
+    ensureRedo(due[0]);
+    savePlanet();
+    return;
+  }
+  if (planet.math.desk === "review") {
+    if (!due.length) {
+      planet.math.desk = planet.math.learn && planet.math.learn.finished ? "oral" : "learn";
+      savePlanet();
+      return;
+    }
+    ensureRedo(due[0]);
+    if (changed) savePlanet();
+    return;
+  }
+  if (changed) savePlanet();
+}
+function alignLearnToPoint() {
+  if (planet.gradeKey === "pre") return;
+  if (!planet.math.learn) planet.math.learn = defaultLearn();
+  const learn = planet.math.learn;
+  const nextId = planet.math.bank === "small" ? "borrow-twenty" : "borrow-tens";
+  if (learn.lessonId === nextId) return;
+  learn.lessonId = nextId;
+  resetLearnProgress(learn, todayKey());
+}
+
+function currentLearnLesson() {
+  const learn = planet.math.learn || defaultLearn();
+  return lessonById(learn.lessonId) || lessonsForGrade(planet.gradeKey)[0];
+}
+
+function currentLearnItem(lesson, learn) {
+  if (learn.step >= 4) {
+    const index = learn.drill >= lesson.drills.length ? lesson.drills.length - 1 : learn.drill;
+    if (index < 0) return lesson.model;
+    return lesson.drills[index];
+  }
+  return lesson.model;
+}
+
+function pushWrong(info) {
+  if (!planet.math.wrongs) planet.math.wrongs = [];
+  const today = todayKey();
+  const tomorrow = tomorrowKey();
+  const wrongs = planet.math.wrongs;
+  for (let i = 0; i < wrongs.length; i += 1) {
+    const item = wrongs[i];
+    if (item.prompt === info.prompt && item.status !== "done") {
+      item.wrong = info.wrong || item.wrong;
+      item.markedOn = today;
+      item.reviewOn = tomorrow;
+      item.redo = null;
+      item.say = info.say || item.say;
+      savePlanet();
+      toast("这道已经在错题里。明天会再练一道同型题。");
+      return;
+    }
+  }
+  wrongs.push({
+    id: "mw" + Date.now() + "-" + wrongs.length,
+    lessonId: info.lessonId || "",
+    title: info.title || "错题",
+    prompt: info.prompt,
+    answer: String(info.answer),
+    wrong: info.wrong || "",
+    markedOn: today,
+    reviewOn: tomorrow,
+    status: "wait",
+    say: info.say || "",
+    choices: info.choices || null,
+    redo: null,
+  });
+  if (wrongs.length > 40) planet.math.wrongs = wrongs.slice(wrongs.length - 40);
+  savePlanet();
+  toast("已标记。明天打开数学，会先复习同型题。");
+}
+
+function learnFollow() {
+  if (planet.gradeKey === "pre") return "学前 · 先看，再读一句口诀，再点一题";
+  if (planet.gradeKey === "g36") return "小学高年级 · 讲解、动画、口诀、母题";
+  if (planet.gradeKey === "mid") return "初中 · 补小学里没稳的点，不排新的初中题";
+  return "小学低年级 · 讲解、动画、口诀、母题";
+}
+
+export function teachView() {
+  const math = planet.math;
+  const learn = math.learn || defaultLearn();
+  const lesson = currentLearnLesson();
+  const due = dueWrongs();
+  const reviewing = due.length ? due[0] : null;
+  const redo = reviewing && reviewing.redo ? reviewing.redo : null;
+  const step = learn.step < 0 ? 0 : learn.step;
+  const stepIndex = step >= 3 ? 3 : step;
+  const item = currentLearnItem(lesson, learn);
+  const frameIndex = learn.frame >= lesson.frames.length ? lesson.frames.length - 1 : learn.frame;
+  const frame = lesson.frames[frameIndex] || lesson.frames[0];
+  let nextLabel = "做母题";
+  if (stepIndex === 0) nextLabel = "看动画";
+  else if (stepIndex === 1 && frameIndex < lesson.frames.length - 1) nextLabel = "再看一步";
+  else if (stepIndex === 1) nextLabel = "读口诀";
+  let progress = "先做这道母题";
+  if (step >= 4) progress = "同型题 " + (learn.drill + 1) + " / " + lesson.drills.length;
+  let hint = "看完再往下。";
+  if (stepIndex === 2) hint = "跟着读一遍就行。";
+  if (step >= 3 && learn.miss) hint = item.say;
+  else if (step === 3) hint = "这是今天的母题。";
+  else if (step >= 4) hint = "数字换了，方法一样。";
+  const finishedToday = !!(learn.finished && learn.day === todayKey());
+  const reviewChoices = redo && redo.choices ? redo.choices : null;
+  let reviewHint = "方法一样，数字换过了。";
+  if (math.reviewMiss && redo) reviewHint = redo.say;
+  return {
+    desk: math.desk || "oral",
+    follow: learnFollow(),
+    title: lesson.title,
+    stage: lesson.stage,
+    explain: lesson.explain,
+    chant: lesson.chant,
+    frames: lesson.frames,
+    frame: frameIndex < 0 ? 0 : frameIndex,
+    frameTitle: frame.title,
+    frameText: frame.text,
+    frameDots: frame.dots,
+    stepNames: ["看一看", "看动画", "读口诀", "做母题"],
+    stepIndex: stepIndex,
+    nextLabel: nextLabel,
+    progress: progress,
+    prompt: item.prompt,
+    choices: !learn.finished && step >= 3 && item.choices ? item.choices : null,
+    showPad: !learn.finished && step >= 3 && !item.choices && planet.gradeKey !== "pre",
+    digitText: learn.digits ? learn.digits : "点数字作答",
+    hint: hint,
+    miss: !!learn.miss,
+    finished: !!learn.finished,
+    entryTitle: "先学再练 · " + lesson.title,
+    entryNote: finishedToday ? "今天这一点学完了，还可以再看一遍" : "看讲解、看动画、读口诀、做母题",
+    dueCount: due.length,
+    waitCount: waitingCount(),
+    wasPrompt: reviewing ? reviewing.prompt : "",
+    wasWrong: reviewing && reviewing.wrong ? reviewing.wrong : "还没写对",
+    reviewTitle: reviewing ? reviewing.title : "",
+    reviewPrompt: redo ? redo.prompt : "",
+    reviewChoices: reviewChoices,
+    reviewPad: !!redo && !reviewChoices && planet.gradeKey !== "pre",
+    reviewDigits: math.reviewDigits ? math.reviewDigits : "点数字作答",
+    reviewHint: reviewHint,
+    reviewMiss: !!math.reviewMiss,
+  };
+}
+
+export function openLearn() {
+  ensureLearn();
+  planet.math.desk = "learn";
+  savePlanet();
+  toast("先看一看，再读口诀，最后做母题。");
+}
+
+export function backToOral() {
+  if (planet.math.desk === "review") planet.math.reviewDay = todayKey();
+  planet.math.desk = "oral";
+  savePlanet();
+  toast("回到口算。");
+}
+
+export function openReview() {
+  const due = dueWrongs();
+  if (!due.length) {
+    toast("还没有到复习日的错题。");
+    return;
+  }
+  planet.math.desk = "review";
+  planet.math.reviewDigits = "";
+  planet.math.reviewMiss = false;
+  ensureRedo(due[0]);
+  savePlanet();
+}
+
+export function replayLearn() {
+  const learn = planet.math.learn;
+  resetLearnProgress(learn, todayKey());
+  learn.lessonId = currentLearnLesson().id;
+  planet.math.desk = "learn";
+  savePlanet();
+  toast("再看一遍这个知识点。");
+}
+
+export function nextLearnStep() {
+  const learn = planet.math.learn;
+  if (!learn || learn.finished) return;
+  const lesson = currentLearnLesson();
+  if (learn.step === 1 && learn.frame < lesson.frames.length - 1) {
+    learn.frame += 1;
+    savePlanet();
+    return;
+  }
+  if (learn.step < 3) {
+    learn.step += 1;
+    learn.miss = false;
+    learn.digits = "";
+    if (learn.step === 1) learn.frame = 0;
+    savePlanet();
+  }
+}
+
+export function submitLearn(guess) {
+  const learn = planet.math.learn;
+  if (!learn || learn.finished || learn.step < 3) return;
+  const lesson = currentLearnLesson();
+  const item = currentLearnItem(lesson, learn);
+  if (!item) return;
+  if (String(guess) !== String(item.answer)) {
+    learn.miss = true;
+    learn.lastGuess = guess ? String(guess) : "";
+    learn.digits = "";
+    toast("还没对。可以再试，也可以标记成错题，明天再练。");
+    return;
+  }
+  learn.miss = false;
+  learn.digits = "";
+  learn.lastGuess = "";
+  if (learn.step === 3) {
+    learn.step = 4;
+    learn.drill = 0;
+    toast("母题做对了。再做几道只改数字的。");
+    savePlanet();
+    return;
+  }
+  if (learn.drill < lesson.drills.length - 1) {
+    learn.drill += 1;
+    toast("做对了。数字换了，方法一样。");
+    savePlanet();
+    return;
+  }
+  learn.finished = true;
+  learn.day = todayKey();
+  toast("今天这一点学完了。可以去口算。");
+  savePlanet();
+}
+
+export function pressLearnKey(key) {
+  const learn = planet.math.learn;
+  if (!learn || learn.finished || learn.step < 3) return;
+  const item = currentLearnItem(currentLearnLesson(), learn);
+  if (!item || item.choices || planet.gradeKey === "pre") return;
+  if (key === "ok") {
+    if (!learn.digits) {
+      toast("先点数字。");
+      return;
+    }
+    submitLearn(learn.digits);
+    return;
+  }
+  if (key === "del") {
+    learn.digits = learn.digits.slice(0, -1);
+    return;
+  }
+  if (/^\d$/.test(key)) learn.digits = (learn.digits + key).slice(-3);
+}
+
+export function markLearnMiss() {
+  const learn = planet.math.learn;
+  if (!learn || !learn.miss) {
+    toast("先做一次。没做对再标记。");
+    return;
+  }
+  const lesson = currentLearnLesson();
+  const item = currentLearnItem(lesson, learn);
+  pushWrong({
+    lessonId: lesson.id,
+    title: lesson.title,
+    prompt: item.prompt,
+    answer: item.answer,
+    wrong: learn.lastGuess || "还没做对",
+    say: item.say,
+    choices: item.choices,
+  });
+}
+
+export function markOralWrong() {
+  const math = planet.math;
+  if (!math.awaitingWhy) {
+    toast("这道还没做错。做错过再标记。");
+    return;
+  }
+  const item = currentMathItem();
+  let lessonId = math.bank === "small" ? "borrow-twenty" : "borrow-tens";
+  let title = item.kind || "口算";
+  let choices = null;
+  if (math.mode === "unit") {
+    lessonId = "unit-length";
+    title = "厘米和米";
+  }
+  if (math.mode === "cmp") {
+    lessonId = "more-less";
+    title = "比大小";
+    choices = [
+      { id: ">", text: "大于" },
+      { id: "<", text: "小于" },
+      { id: "=", text: "等于" },
+    ];
+  }
+  pushWrong({
+    lessonId: lessonId,
+    title: title,
+    prompt: faceText(item),
+    answer: String(expected(item)),
+    wrong: math.lastGuess || "还没写对",
+    say: item.hint || "",
+    choices: choices,
+  });
+}
+
+export function markPreWrong() {
+  if (!planet.math.preMiss) {
+    toast("先点一次。点错了再标记。");
+    return;
+  }
+  pushWrong({
+    lessonId: "more-less",
+    title: "比多少",
+    prompt: "哪一堆苹果更多？",
+    answer: "right",
+    wrong: "点了少的那一堆",
+    say: "更多的那一堆再数一次。",
+    choices: [
+      { id: "left", text: "左边少一些" },
+      { id: "right", text: "右边更多" },
+    ],
+  });
+}
+
+export function submitReview(guess) {
+  const due = dueWrongs();
+  const wrong = due.length ? due[0] : null;
+  if (!wrong || !wrong.redo) return;
+  if (String(guess) !== String(wrong.redo.answer)) {
+    planet.math.reviewMiss = true;
+    planet.math.reviewDigits = "";
+    toast("还没对。可以再试，也可以留到明天。");
+    return;
+  }
+  wrong.status = "done";
+  planet.math.reviewMiss = false;
+  planet.math.reviewDigits = "";
+  const left = dueWrongs();
+  if (left.length) {
+    ensureRedo(left[0]);
+    toast("这道移出复习了。还有一道昨天的错题。");
+  } else {
+    planet.math.reviewDay = todayKey();
+    planet.math.desk = planet.math.learn && planet.math.learn.finished ? "oral" : "learn";
+    toast("昨天的错题都复习过了。");
+  }
+  savePlanet();
+}
+
+export function pressReviewKey(key) {
+  const due = dueWrongs();
+  const wrong = due.length ? due[0] : null;
+  if (!wrong || !wrong.redo || wrong.redo.choices || planet.gradeKey === "pre") return;
+  const math = planet.math;
+  if (key === "ok") {
+    if (!math.reviewDigits) {
+      toast("先点数字。");
+      return;
+    }
+    submitReview(math.reviewDigits);
+    return;
+  }
+  if (key === "del") {
+    math.reviewDigits = math.reviewDigits.slice(0, -1);
+    return;
+  }
+  if (/^\d$/.test(key)) math.reviewDigits = (math.reviewDigits + key).slice(-3);
+}
+
+export function holdReview() {
+  const due = dueWrongs();
+  const wrong = due.length ? due[0] : null;
+  if (!wrong) return;
+  wrong.reviewOn = tomorrowKey();
+  wrong.redo = null;
+  planet.math.reviewMiss = false;
+  planet.math.reviewDigits = "";
+  const left = dueWrongs();
+  if (left.length) {
+    ensureRedo(left[0]);
+    toast("这道留到明天。先看下一道到期的。");
+  } else {
+    planet.math.reviewDay = todayKey();
+    planet.math.desk = "oral";
+    toast("这道留到明天再复习。");
+  }
+  savePlanet();
+}
+
+export function skipReviewToLearn() {
+  planet.math.reviewDay = todayKey();
+  ensureLearn();
+  planet.math.desk = "learn";
+  savePlanet();
+  toast("先学今天的知识点。错题还留着，可以再回来。");
+}
+
 export function cycleGrade() {
   const index = GRADE_ORDER.indexOf(planet.gradeKey);
   const next = GRADE_ORDER[(index + 1) % GRADE_ORDER.length];
   planet.gradeKey = next || "g12";
+  const list = lessonsForGrade(planet.gradeKey);
+  const learn = planet.math.learn || defaultLearn();
+  planet.math.learn = learn;
+  let allowed = false;
+  for (let i = 0; i < list.length; i += 1) {
+    if (list[i].id === learn.lessonId) allowed = true;
+  }
+  if (!allowed) {
+    learn.lessonId = list[0].id;
+    resetLearnProgress(learn, todayKey());
+  }
+  planet.math.desk = "oral";
   savePlanet();
   toast(gradeInfo().toast);
 }
