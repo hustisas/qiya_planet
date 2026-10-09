@@ -570,7 +570,7 @@ export function readPoem(kind) {
       subject: "chinese",
       evalKind: "poem",
     });
-    say = "一起读「" + line.text + "」。读完会看几颗星。";
+    say = "一起读「" + line.text + "」。按住读，松开就结束。";
   }
   toast(say);
   return say;
@@ -901,6 +901,9 @@ export function missedWords() {
 }
 
 let speechTimer = 0;
+let speechHeld = false;
+let speechReleaseBound = false;
+let ignoreMouseUntil = 0;
 
 function todayKey() {
   const now = new Date();
@@ -986,6 +989,7 @@ function syncReviewFlag(speech) {
 }
 
 export function openSpeech(target) {
+  resetSpeechHold();
   refreshSpeakQuota();
   clearSpeechTimer();
   discardRecording();
@@ -1008,10 +1012,11 @@ export function allowSpeak() {
   refreshSpeakQuota();
   play.speech.phase = planet.speakLeft <= 0 ? "limit" : "ready";
   play.speechOn = true;
-  toast("已同意。读完会看几颗星，不显示分数。");
+  toast("已同意。按住读，松开就结束。不显示分数。");
 }
 
 export function denySpeak() {
+  resetSpeechHold();
   const speech = play.speech;
   play.speechAsk = false;
   play.speechOn = false;
@@ -1021,6 +1026,7 @@ export function denySpeak() {
 }
 
 export function closeSpeech() {
+  resetSpeechHold();
   clearSpeechTimer();
   discardRecording();
   const back = play.speech ? play.speech.returnView : "";
@@ -1063,28 +1069,70 @@ export function playSpeechSample() {
   toast("正在播放 " + speech.refText + "。");
 }
 
-export function toggleSpeech() {
+function bindSpeechRelease() {
+  if (speechReleaseBound || typeof document === "undefined") return;
+  speechReleaseBound = true;
+  document.addEventListener("mouseup", releaseSpeech, true);
+  document.addEventListener("touchend", releaseSpeech, true);
+  document.addEventListener("touchcancel", releaseSpeech, true);
+}
+
+function unbindSpeechRelease() {
+  if (!speechReleaseBound || typeof document === "undefined") {
+    speechReleaseBound = false;
+    return;
+  }
+  speechReleaseBound = false;
+  document.removeEventListener("mouseup", releaseSpeech, true);
+  document.removeEventListener("touchend", releaseSpeech, true);
+  document.removeEventListener("touchcancel", releaseSpeech, true);
+}
+
+function resetSpeechHold() {
+  speechHeld = false;
+  unbindSpeechRelease();
+}
+
+export function pressSpeech(event) {
+  const fromMouse = event && event.type === "mousedown";
+  if (fromMouse && event.button !== undefined && event.button !== 0) return;
+  if (fromMouse && Date.now() < ignoreMouseUntil) return;
+  if (speechHeld) return;
+  const speech = play.speech;
+  if (!speech) return;
+  if (speech.phase === "opening" || speech.phase === "recording" || speech.phase === "assessing" || speech.phase === "limit") return;
+  if (event && event.type === "touchstart") ignoreMouseUntil = Date.now() + 800;
+  speechHeld = true;
+  speech.releaseEarly = false;
+  bindSpeechRelease();
+  if (!startSpeech()) resetSpeechHold();
+}
+
+export function releaseSpeech() {
+  if (!speechHeld) return;
+  speechHeld = false;
+  unbindSpeechRelease();
   const speech = play.speech;
   if (!speech) return;
   if (speech.phase === "recording") {
     stopSpeech();
     return;
   }
-  if (speech.phase === "ready" || speech.phase === "result") startSpeech();
+  if (speech.phase === "opening") speech.releaseEarly = true;
 }
 
 export function startSpeech() {
   const speech = play.speech;
-  if (!speech) return;
-  if (speech.phase === "recording" || speech.phase === "opening" || speech.phase === "assessing") return;
+  if (!speech) return false;
+  if (speech.phase === "recording" || speech.phase === "opening" || speech.phase === "assessing") return false;
   refreshSpeakQuota();
   if (planet.speakLeft <= 0) {
     if (speech.phase === "result" && speech.stars === 0 && !speech.inReview) {
       toast("今天次数用完了。这句可以先放进复习。");
-      return;
+      return false;
     }
     speech.phase = "limit";
-    return;
+    return false;
   }
   speech.phase = "opening";
   speech.seconds = 0;
@@ -1097,6 +1145,12 @@ export function startSpeech() {
     }
     if (!started || speech.phase !== "opening") {
       discardRecording();
+      if (play.speech === speech && (speech.releaseEarly || speech.phase === "opening")) {
+        speech.phase = "result";
+        speech.status = "unclear";
+        speech.hint = "没听清。按住橙色按钮读，松开再结束。这次不扣次数。";
+        speech.canReview = false;
+      }
       return;
     }
     speech.phase = "recording";
@@ -1108,6 +1162,7 @@ export function startSpeech() {
       speech.seconds = seconds;
       if (seconds >= 8) stopSpeech();
     }, 200);
+    if (speech.releaseEarly || !speechHeld) stopSpeech();
   }).catch(() => {
     if (!play.speech || play.speech !== speech) return;
     speech.phase = "result";
@@ -1115,6 +1170,7 @@ export function startSpeech() {
     speech.hint = "没有打开麦克风。可以先听标准音，这次不扣次数。";
     speech.canReview = false;
   });
+  return true;
 }
 
 export function stopSpeech() {

@@ -385,8 +385,9 @@
           <button class="qp-chip-btn" :class="{ 'is-on': play.speech.piece !== 'sentence' }" @click="setSpeechPiece('word')">读单词</button>
           <button class="qp-chip-btn" :class="{ 'is-on': play.speech.piece === 'sentence' }" @click="setSpeechPiece('sentence')">读这一句</button>
         </view>
-        <view v-if="play.speech.phase === 'recording'" class="qp-hint">正在听 {{ play.speech.seconds }} 秒。读完点下面。</view>
-        <view v-else-if="play.speech.phase === 'opening' || play.speech.phase === 'assessing'" class="qp-hint">芽芽在听你读得像不像。</view>
+        <view v-if="play.speech.phase === 'recording'" class="qp-hint">正在听 {{ play.speech.seconds }} 秒。松开就结束。</view>
+        <view v-else-if="play.speech.phase === 'opening'" class="qp-hint">麦克风准备中，请先不要松开。</view>
+        <view v-else-if="play.speech.phase === 'assessing'" class="qp-hint">芽芽在听你读得像不像。</view>
         <view v-else-if="play.speech.phase === 'result' && play.speech.status === 'scored'">
           <view class="qp-stars">{{ starLine(play.speech.stars) }}</view>
           <view class="qp-title">{{ play.speech.label }}</view>
@@ -399,13 +400,19 @@
           <view class="qp-title">这次先不打星</view>
           <view class="qp-sub">{{ play.speech.hint }}</view>
         </view>
-        <view v-else class="qp-hint">先听标准音，再自己读。三星是完美，两星是中等，一星是一般，没有星就是还不准确。</view>
+        <view v-else class="qp-hint">按住橙色按钮读，松开就结束。三星是完美，两星是中等，一星是一般，没有星就是还不准确。</view>
         <button
           class="qp-rec"
-          :class="{ 'is-on': play.speech.phase === 'recording' }"
-          :disabled="play.speech.phase === 'opening' || play.speech.phase === 'assessing'"
-          @click="toggleSpeech"
-        >{{ play.speech.phase === 'recording' ? '读完了' : '开始读' }}</button>
+          hover-class="none"
+          :class="{ 'is-on': play.speech.phase === 'recording', 'is-wait': play.speech.phase === 'assessing' }"
+          @touchstart.stop.prevent="pressSpeech"
+          @touchmove.stop.prevent="keepSpeechHold"
+          @touchend.stop.prevent="releaseSpeech"
+          @touchcancel.stop.prevent="releaseSpeech"
+          @mousedown.stop.prevent="pressSpeech"
+          @mouseup.stop.prevent="releaseSpeech"
+          @contextmenu.prevent="keepSpeechHold"
+        >{{ speechHoldText() }}</button>
         <button class="qp-ghost" @click="playSpeechSample">听标准音</button>
       </view>
     </view>
@@ -482,7 +489,8 @@ import {
   keepSpeechReview,
   playSpeechSample,
   setSpeechPiece,
-  toggleSpeech,
+  pressSpeech,
+  releaseSpeech,
   readyPhoto,
   resetMath,
   worlds,
@@ -532,4 +540,14 @@ function showNote(note) {
 function sayPoem(kind) {
   poemTalk.value = readPoem(kind);
 }
+
+function speechHoldText() {
+  const phase = play.speech ? play.speech.phase : "";
+  if (phase === "recording") return "松开";
+  if (phase === "opening") return "听着";
+  if (phase === "assessing") return "等一下";
+  return "按住读";
+}
+
+function keepSpeechHold() {}
 </script>

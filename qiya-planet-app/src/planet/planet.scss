@@ -589,10 +589,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .qp-rec.is-on {
   background: #2c241c;
+}
+
+.qp-rec.is-wait {
+  background: #f3c3b6;
 }
 
 .qp-rec[disabled] {
