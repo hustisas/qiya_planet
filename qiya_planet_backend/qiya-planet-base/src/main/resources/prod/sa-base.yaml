@@ -182,3 +182,16 @@ smart:
     db-refresh-enabled: true
     # 数据库配置检测-执行间隔 默认120秒 可选
     db-refresh-interval: 60
+
+# 跟读口评。密钥只放服务端，不要写进 App。
+# 腾讯云智聆口语评测 TransmitOralProcessWithInit，用 SuggestedScore 换算星级。
+qiya:
+  speech:
+    provider: tencent
+    burst-per-minute: 40
+    tencent:
+      secret-id:
+      secret-key:
+      region:
+      host: soe.tencentcloudapi.com
+      score-coeff: 1.5
