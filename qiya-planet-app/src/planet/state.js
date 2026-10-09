@@ -6,6 +6,7 @@ import {
   PHOTO_TOTAL,
   PHOTO_WORDS,
   SPEAK_TOTAL,
+  SPELL_WORDS,
   UNIT_SET,
   WORLDS,
   makeRepair,
@@ -25,7 +26,7 @@ const TAB_ROUTE = {
 };
 
 const HOME_VIEWS = ["home", "listen", "mine"];
-const ENGLISH_VIEWS = ["map", "battle", "settle", "book", "photocam", "photolook", "photopick", "photoblur", "photo", "photolimit", "speaklimit", "photogate"];
+const ENGLISH_VIEWS = ["map", "battle", "settle", "book", "spell", "photocam", "photolook", "photopick", "photoblur", "photo", "photolimit", "speaklimit", "photogate"];
 const POEM_VIEWS = ["poet", "poem"];
 const MATH_VIEWS = ["math", "mreport", "points"];
 
@@ -88,12 +89,15 @@ export const play = reactive({
   speechOn: false,
   speechAsk: false,
   speech: null,
+  spell: null,
 });
 
 let booted = false;
 let toastTimer = 0;
 let photoTimer = 0;
 let battleTimer = 0;
+let spellTimer = 0;
+let spellAudio = null;
 let poetTimer = 0;
 
 function readSaved() {
@@ -221,6 +225,7 @@ export function ensureTab(tab) {
 }
 
 export function openView(name) {
+  if (name !== "spell") stopSpellAudio();
   play.view = name;
   const target = TAB_ROUTE[tabOf(name)];
   const pages = getCurrentPages();
@@ -353,6 +358,371 @@ export function bookWords() {
     if (all[i].tab === planet.bookTab) list.push(all[i]);
   }
   return list;
+}
+
+function shuffleLetters(list) {
+  const copy = list.slice();
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = copy[i];
+    copy[i] = copy[j];
+    copy[j] = tmp;
+  }
+  return copy;
+}
+
+function extraLetters(word, count) {
+  const alphabet = "abcdefghijklmnopqrstuvwxyz";
+  const used = {};
+  const pool = [];
+  for (let i = 0; i < word.length; i += 1) used[word.charAt(i)] = true;
+  for (let i = 0; i < alphabet.length; i += 1) {
+    if (!used[alphabet.charAt(i)]) pool.push(alphabet.charAt(i));
+  }
+  const shuffled = shuffleLetters(pool);
+  const out = [];
+  for (let i = 0; i < count && i < shuffled.length; i += 1) out.push(shuffled[i]);
+  return out;
+}
+
+function spellPool() {
+  const list = [];
+  const seen = {};
+  for (let i = 0; i < SPELL_WORDS.length; i += 1) {
+    list.push(SPELL_WORDS[i]);
+    seen[SPELL_WORDS[i].en] = true;
+  }
+  const saved = PHOTO_WORDS[planet.savedPhoto];
+  if (saved && !seen[saved.en]) list.unshift({ en: saved.en, zh: saved.zh, emoji: saved.emoji });
+  return list;
+}
+
+function findSpellItem(en) {
+  const pool = spellPool();
+  for (let i = 0; i < pool.length; i += 1) {
+    if (pool[i].en === en) return pool[i];
+  }
+  return { en: en, zh: "这个词", emoji: "✏️" };
+}
+
+function stopSpellAudio() {
+  if (typeof window !== "undefined" && window.speechSynthesis) {
+    try {
+      window.speechSynthesis.cancel();
+    } catch (err) {
+      /* 停止上一次朗读失败时，继续播这一次 */
+    }
+  }
+  if (!spellAudio) return;
+  try {
+    if (spellAudio.stop) spellAudio.stop();
+    if (spellAudio.pause) spellAudio.pause();
+    if (spellAudio.destroy) spellAudio.destroy();
+  } catch (err) {
+    /* 关掉上一段读音失败也不影响下一题 */
+  }
+  spellAudio = null;
+}
+
+function englishVoice() {
+  if (typeof window === "undefined" || !window.speechSynthesis || !window.speechSynthesis.getVoices) return null;
+  const voices = window.speechSynthesis.getVoices();
+  for (let i = 0; i < voices.length; i += 1) {
+    const lang = String(voices[i].lang || "").toLowerCase();
+    if (lang.indexOf("en") === 0) return voices[i];
+  }
+  return null;
+}
+
+function speakWithSynth(text) {
+  if (typeof window === "undefined" || !window.speechSynthesis || !window.SpeechSynthesisUtterance) {
+    toast("这台设备暂时读不出来。可以先看意思拼。");
+    return;
+  }
+  const utter = new window.SpeechSynthesisUtterance(text);
+  utter.lang = "en-US";
+  utter.rate = 0.82;
+  const voice = englishVoice();
+  if (voice) utter.voice = voice;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utter);
+}
+
+function playDictAudio(text) {
+  const url = "https://dict.youdao.com/dictvoice?audio=" + encodeURIComponent(text) + "&type=2";
+  let fell = false;
+  function fail() {
+    if (fell) return;
+    fell = true;
+    speakWithSynth(text);
+  }
+  if (typeof Audio !== "undefined") {
+    stopSpellAudio();
+    const audio = new Audio(url);
+    spellAudio = audio;
+    audio.onerror = fail;
+    const played = audio.play();
+    if (played && played.catch) played.catch(fail);
+    return true;
+  }
+  if (typeof uni !== "undefined" && uni.createInnerAudioContext) {
+    stopSpellAudio();
+    const audio = uni.createInnerAudioContext();
+    spellAudio = audio;
+    audio.src = url;
+    audio.onError(fail);
+    audio.play();
+    return true;
+  }
+  return false;
+}
+
+function speakEnglish(word) {
+  const text = String(word || "").toLowerCase();
+  if (!text) return;
+  if (englishVoice()) {
+    stopSpellAudio();
+    speakWithSynth(text);
+    return;
+  }
+  if (playDictAudio(text)) return;
+  speakWithSynth(text);
+}
+
+function loadSpellRound(spell) {
+  const item = spell.queue[spell.index];
+  const word = item.en.toLowerCase();
+  const sound = spell.mode === "sound";
+  const showWord = !sound && planet.gradeKey === "pre";
+  const lockFirst = !sound && planet.gradeKey === "g12" && word.length > 1;
+  const freeType = sound && (planet.gradeKey === "g36" || planet.gradeKey === "mid");
+  const bank = [];
+  if (freeType) {
+    const alphabet = "abcdefghijklmnopqrstuvwxyz";
+    for (let i = 0; i < alphabet.length; i += 1) {
+      bank.push({ id: "key-" + alphabet.charAt(i), letter: alphabet.charAt(i), used: false });
+    }
+  } else {
+    const extras = showWord ? 0 : 2;
+    const tiles = [];
+    for (let i = 0; i < word.length; i += 1) tiles.push({ id: spell.index + "-" + i, letter: word.charAt(i), used: false });
+    const more = extraLetters(word, extras);
+    for (let i = 0; i < more.length; i += 1) tiles.push({ id: spell.index + "-x" + i, letter: more[i], used: false });
+    const shuffled = shuffleLetters(tiles);
+    for (let i = 0; i < shuffled.length; i += 1) bank.push(shuffled[i]);
+  }
+  const slots = [];
+  for (let i = 0; i < word.length; i += 1) slots.push({ letter: "", lock: false, tileId: "" });
+  if (lockFirst) {
+    for (let i = 0; i < bank.length; i += 1) {
+      if (bank[i].letter === word.charAt(0)) {
+        bank[i].used = true;
+        slots[0] = { letter: word.charAt(0), lock: true, tileId: bank[i].id };
+        break;
+      }
+    }
+  }
+  spell.slots = slots;
+  spell.bank = bank;
+  spell.freeType = freeType;
+  spell.showWord = showWord;
+  spell.hintUsed = false;
+  spell.tried = false;
+  spell.status = "";
+  spell.bad = false;
+  spell.message = sound ? "先听读音，再把听到的词拼出来。" : showWord ? "看着单词，按顺序点字母。" : lockFirst ? "第一个字母已经放好了。把剩下的拼完。" : "看意思，把字母拼成单词。";
+  if (sound) speakEnglish(word);
+}
+
+function spellFilled(spell) {
+  for (let i = 0; i < spell.slots.length; i += 1) {
+    if (!spell.slots[i].letter) return false;
+  }
+  return spell.slots.length > 0;
+}
+
+function spellJoined(spell) {
+  let text = "";
+  for (let i = 0; i < spell.slots.length; i += 1) text += spell.slots[i].letter;
+  return text;
+}
+
+function advanceSpell() {
+  const spell = play.spell;
+  if (!spell) return;
+  if (spell.index >= spell.queue.length - 1) {
+    spell.done = true;
+    spell.message = "这组拼完了。";
+    return;
+  }
+  spell.index += 1;
+  loadSpellRound(spell);
+}
+
+function judgeSpell() {
+  const spell = play.spell;
+  if (!spell || spell.done) return;
+  const item = spell.queue[spell.index];
+  const ok = spellJoined(spell) === item.en.toLowerCase();
+  if (ok) {
+    spell.status = "ok";
+    spell.bad = false;
+    if (spell.tried) spell.message = "改对了。这个词还要再见一次。";
+    else {
+      spell.message = "拼对了。";
+      if (spell.got.indexOf(item.en) < 0) spell.got.push(item.en);
+    }
+    clearTimeout(spellTimer);
+    spellTimer = setTimeout(() => {
+      if (!play.spell || play.view !== "spell") return;
+      advanceSpell();
+    }, 700);
+    return;
+  }
+  spell.tried = true;
+  spell.status = "bad";
+  spell.bad = true;
+  spell.message = spell.mode === "sound" ? "有字母放错了。它的意思是" + item.zh + "。点格子可以拿下来。" : "有字母放错了。点上面的格子可以拿下来。";
+  if (spell.missed.indexOf(item.en) < 0) spell.missed.push(item.en);
+}
+
+export function canSpell(en) {
+  return /^[a-zA-Z]+$/.test(String(en || ""));
+}
+
+export function startSpell(en, mode) {
+  clearTimeout(spellTimer);
+  const queue = [];
+  const seen = {};
+  const wanted = en ? String(en).toLowerCase() : "";
+  if (wanted && canSpell(wanted)) {
+    queue.push(findSpellItem(wanted));
+    seen[wanted] = true;
+  }
+  const pool = spellPool();
+  for (let i = 0; i < pool.length; i += 1) {
+    if (seen[pool[i].en]) continue;
+    queue.push(pool[i]);
+    seen[pool[i].en] = true;
+    if (queue.length >= 4) break;
+  }
+  if (!queue.length) {
+    toast("还没有可以拼的单词");
+    return;
+  }
+  const spell = {
+    queue: queue,
+    index: 0,
+    slots: [],
+    bank: [],
+    status: "",
+    message: "",
+    got: [],
+    missed: [],
+    hintUsed: false,
+    showWord: false,
+    done: false,
+    bad: false,
+    tried: false,
+    mode: mode === "sound" ? "sound" : "mean",
+    freeType: false,
+  };
+  loadSpellRound(spell);
+  play.spell = spell;
+  openView("spell");
+}
+
+export function pressSpell(id) {
+  const spell = play.spell;
+  if (!spell || spell.done || spell.status === "ok") return;
+  let tile = null;
+  for (let i = 0; i < spell.bank.length; i += 1) {
+    if (spell.bank[i].id === id) tile = spell.bank[i];
+  }
+  if (!tile || (tile.used && !spell.freeType)) return;
+  let slot = null;
+  for (let i = 0; i < spell.slots.length; i += 1) {
+    if (!spell.slots[i].letter) {
+      slot = spell.slots[i];
+      break;
+    }
+  }
+  if (!slot) return;
+  if (!spell.freeType) tile.used = true;
+  slot.letter = tile.letter;
+  slot.tileId = tile.id;
+  spell.bad = false;
+  if (spellFilled(spell)) judgeSpell();
+}
+
+export function replaySpell() {
+  const spell = play.spell;
+  if (!spell || spell.done || spell.mode !== "sound") return;
+  speakEnglish(spell.queue[spell.index].en);
+}
+
+export function startHearSpell(en) {
+  startSpell(en || "", "sound");
+}
+
+export function againSpell() {
+  const mode = play.spell && play.spell.mode === "sound" ? "sound" : "mean";
+  startSpell("", mode);
+}
+
+export function undoSpell(index) {
+  const spell = play.spell;
+  if (!spell || spell.done || spell.status === "ok") return;
+  const slot = spell.slots[index];
+  if (!slot || slot.lock || !slot.letter) return;
+  for (let i = 0; i < spell.bank.length; i += 1) {
+    if (spell.bank[i].id === slot.tileId) spell.bank[i].used = false;
+  }
+  slot.letter = "";
+  slot.tileId = "";
+  spell.bad = false;
+  spell.status = "";
+}
+
+export function hintSpell() {
+  const spell = play.spell;
+  if (!spell || spell.done || spell.status === "ok") return;
+  if (spell.hintUsed) {
+    spell.message = "这个词只能看一个字母。";
+    return;
+  }
+  const word = spell.queue[spell.index].en.toLowerCase();
+  let slotIndex = -1;
+  for (let i = 0; i < spell.slots.length; i += 1) {
+    if (!spell.slots[i].letter) {
+      slotIndex = i;
+      break;
+    }
+  }
+  if (slotIndex < 0) {
+    spell.message = "格子已经满了。先点掉一个再看提示。";
+    return;
+  }
+  const need = word.charAt(slotIndex);
+  let tile = null;
+  for (let i = 0; i < spell.bank.length; i += 1) {
+    if (!spell.bank[i].used && spell.bank[i].letter === need) {
+      tile = spell.bank[i];
+      break;
+    }
+  }
+  if (!tile) {
+    spell.message = "这个字母已经用过了。先把放错的拿下来。";
+    return;
+  }
+  if (!spell.freeType) tile.used = true;
+  spell.slots[slotIndex].letter = need;
+  spell.slots[slotIndex].tileId = tile.id;
+  spell.slots[slotIndex].lock = true;
+  spell.hintUsed = true;
+  spell.bad = false;
+  spell.message = "帮你放了一个字母。";
+  if (spellFilled(spell)) judgeSpell();
 }
 
 export function currentPhoto() {

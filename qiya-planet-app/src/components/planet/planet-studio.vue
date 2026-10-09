@@ -48,6 +48,8 @@
           <button class="qp-cta" @click="openView('photocam')">拍照收词</button>
         </view>
         <button class="qp-cta" @click="startBattle(false)">开始闯关</button>
+        <button class="qp-ghost" @click="startSpell()">拼一拼</button>
+        <button class="qp-ghost" @click="startHearSpell()">听音写</button>
       </view>
 
       <view v-else-if="view === 'battle'" class="qp-page">
@@ -101,8 +103,12 @@
           <text class="qp-tiny">{{ word.note }}</text>
           <button v-if="word.reviewId" class="qp-ghost" @click="againReview(word.reviewId)">再读一次</button>
           <button v-if="word.reviewId" class="qp-ghost" @click="dropReview(word.reviewId)">移出复习</button>
+          <button v-if="canSpell(word.en)" class="qp-ghost" @click="startSpell(word.en)">拼一拼</button>
+          <button v-if="canSpell(word.en)" class="qp-ghost" @click="startHearSpell(word.en)">听音写</button>
         </view>
         <button class="qp-cta" @click="startBattle(false)">复习这些词</button>
+        <button class="qp-ghost" @click="startSpell()">拼这些词</button>
+        <button class="qp-ghost" @click="startHearSpell()">听音写</button>
       </view>
 
       <view v-else-if="view === 'photocam'" class="qp-page">
@@ -161,6 +167,8 @@
         <view class="qp-row">
           <button class="qp-ghost" @click="playStandard">听一听</button>
           <button class="qp-ghost" @click="followRead">跟我读</button>
+          <button class="qp-ghost" @click="startSpell(saved.en)">拼这个词</button>
+          <button class="qp-ghost" @click="startHearSpell(saved.en)">听音写</button>
         </view>
         <button class="qp-cta" @click="openView('battle')">用它闯一关</button>
         <button class="qp-ghost" @click="openView('book')">放入单词本</button>
@@ -342,12 +350,70 @@
         </button>
       </view>
 
+      <view v-else-if="view === 'spell' && play.spell" class="qp-page">
+        <view class="qp-row">
+          <button class="qp-back" @click="openView('map')">返回</button>
+          <text v-if="!play.spell.done" class="qp-chip">{{ play.spell.index + 1 }} / {{ play.spell.queue.length }}</text>
+        </view>
+        <view v-if="play.spell.done">
+          <view class="qp-title">{{ play.spell.mode === 'sound' ? '这组听写完了' : '这组拼完了' }}</view>
+          <view class="qp-sub">一次拼对 {{ play.spell.got.length }} 个</view>
+          <view class="qp-card">
+            <view class="qp-sub">一次拼对</view>
+            <view class="qp-pills">
+              <text v-if="play.spell.got.length === 0" class="qp-pill">这次还没有一次拼对</text>
+              <text v-for="word in play.spell.got" :key="word" class="qp-pill">{{ word }}</text>
+            </view>
+            <view class="qp-sub">还要再拼</view>
+            <view class="qp-pills">
+              <text v-if="play.spell.missed.length === 0" class="qp-pill">没有放错的词</text>
+              <text v-for="word in play.spell.missed" :key="word" class="qp-pill is-warn">{{ word }}</text>
+            </view>
+          </view>
+          <button class="qp-cta" @click="againSpell()">{{ play.spell.mode === 'sound' ? '再听一组' : '再拼一组' }}</button>
+          <button class="qp-ghost" @click="openView('book')">回单词本</button>
+        </view>
+        <view v-else>
+          <view v-if="play.spell.mode === 'sound'" class="qp-spell-hear">
+            <button class="qp-cta" @click="replaySpell">再听一次</button>
+            <view class="qp-sub">听读音，把单词拼出来。先不看这个词。</view>
+          </view>
+          <view v-else>
+            <view class="qp-cam-shot">{{ play.spell.queue[play.spell.index].emoji }}</view>
+            <view class="qp-question">{{ play.spell.queue[play.spell.index].zh }}</view>
+            <view v-if="play.spell.showWord" class="qp-sub">看着拼：{{ play.spell.queue[play.spell.index].en }}</view>
+          </view>
+          <view class="qp-spell-slots">
+            <button
+              v-for="(slot, index) in play.spell.slots"
+              :key="index"
+              class="qp-spell-slot"
+              :class="{ 'is-lock': slot.lock, 'is-bad': play.spell.bad }"
+              @click="undoSpell(index)"
+            >{{ slot.letter }}</button>
+          </view>
+          <view class="qp-hint">{{ play.spell.message }}</view>
+          <view class="qp-spell-bank" :class="{ 'is-keys': play.spell.freeType }">
+            <button
+              v-for="tile in play.spell.bank"
+              :key="tile.id"
+              class="qp-spell-key"
+              :class="{ 'is-used': tile.used }"
+              @click="pressSpell(tile.id)"
+            >{{ tile.letter }}</button>
+          </view>
+          <button class="qp-ghost" @click="hintSpell">看一个字母</button>
+        </view>
+      </view>
+
       <view v-else-if="view === 'listen'" class="qp-page">
         <view class="qp-title">磨耳朵电台</view>
         <button class="qp-card" @click="toggleListen">
           🍳 厨房里的苹果
           <text class="qp-tiny">{{ play.listenOn ? '正在播放 · 可跟读' : '1:20 / 2:46 · 可跟读' }}</text>
         </button>
+        <button class="qp-ghost" @click="startSpell()">拼一拼</button>
+        <button class="qp-ghost" @click="startHearSpell()">听音写</button>
         <button class="qp-cta" @click="openView('home')">听完回星球</button>
       </view>
 
@@ -469,6 +535,14 @@ import {
   shootPhoto,
   starLine,
   startBattle,
+  startSpell,
+  startHearSpell,
+  againSpell,
+  replaySpell,
+  canSpell,
+  hintSpell,
+  pressSpell,
+  undoSpell,
   stopMath,
   submitMath,
   submitPre,

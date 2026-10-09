@@ -278,6 +278,76 @@
   color: #c45332;
 }
 
+.qp-spell-slots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12rpx;
+  margin: 28rpx 0 12rpx;
+}
+
+.qp-spell-slot {
+  width: 76rpx;
+  height: 88rpx;
+  padding: 0;
+  border-radius: 18rpx;
+  background: #fff;
+  color: #2c241c;
+  border: 4rpx solid #ffd0c4;
+  font-size: 40rpx;
+  font-weight: 800;
+  line-height: 80rpx;
+}
+
+.qp-spell-slot.is-lock {
+  color: #ff6b4a;
+  background: #fff4ef;
+}
+
+.qp-spell-slot.is-bad {
+  border-color: #e25b4a;
+}
+
+.qp-spell-bank {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16rpx;
+  margin-top: 18rpx;
+}
+
+.qp-spell-key {
+  width: 88rpx;
+  height: 88rpx;
+  padding: 0;
+  border-radius: 22rpx;
+  background: #fff7f3;
+  color: #2c241c;
+  font-size: 36rpx;
+  font-weight: 800;
+  line-height: 88rpx;
+}
+
+.qp-spell-key.is-used {
+  opacity: 0.28;
+}
+
+.qp-spell-bank.is-keys .qp-spell-key {
+  width: 64rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  font-size: 30rpx;
+}
+
+.qp-spell-hear {
+  margin: 12rpx 0 8rpx;
+}
+
+.qp-spell-slot::after,
+.qp-spell-key::after {
+  border: 0;
+}
+
 .qp-pills {
   display: flex;
   flex-wrap: wrap;

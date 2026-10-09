@@ -74,6 +74,16 @@ export const BATTLE_QUESTIONS = [
   },
 ];
 
+export const SPELL_WORDS = [
+  { en: "apple", zh: "苹果", emoji: "🍎" },
+  { en: "cup", zh: "杯子", emoji: "☕" },
+  { en: "fork", zh: "叉子", emoji: "🍴" },
+  { en: "plate", zh: "盘子", emoji: "🍽️" },
+  { en: "cat", zh: "猫", emoji: "🐱" },
+  { en: "book", zh: "书", emoji: "📖" },
+  { en: "lamp", zh: "台灯", emoji: "💡" },
+];
+
 export const POEMS = [
   {
     id: "jing",
